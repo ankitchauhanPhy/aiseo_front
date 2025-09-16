@@ -16,16 +16,16 @@ const MentionBarNoDataFound: React.FC = () => {
                      <img src={Vector} alt="No Data" className="w-12 h-12 mb-4" />
 
                     <h3 className="text-[#7C3BED] font-semibold text-lg mb-2">
-                        No Data Found!
+                        Nothing to see here… yet.​
                     </h3>
 
                     <p className="text-gray-500 mb-2">
-                        You may still click on other competitors and view their Analytics
+                        We didn’t find data for this query - but your competitors are already showing up.​
                     </p>
 
                     <p className="text-gray-500 font-semibold">
-                        <span className="text-[#7C3BED]">Good News:</span> Optimization is
-                        coming soon which will increase your visibility
+                     Explore their analytics to see what’s working for them.​
+And when you’re ready, we’ll help you turn “no data” into visibility.​
                     </p>
                 </div>
             </div>

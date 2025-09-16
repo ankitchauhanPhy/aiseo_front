@@ -19,9 +19,10 @@ const SignUpPopup = () => {
   const [formData, setFormData] = useState<SignUpForm>({
     firstName: "",
     familyName: "",
-    companyName: "",
+    username:"",
+    company_name: "",
     jobRole: "",
-    workEmail: "",
+    email: "",
     password: "",
     confirmPassword: "",
     agreeTC: false,
@@ -47,8 +48,9 @@ const SignUpPopup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Perform signup logic here
-    console.log(formData);
+    console.log(formData,"formData");
     try {
+      formData.username = formData.firstName + formData.familyName;
       const data = await AuthAPI.signup(formData);
       console.log("Signup Success", data);
       if (data.create) {
@@ -144,8 +146,8 @@ const SignUpPopup = () => {
               <input
                 type="text"
                 placeholder="Company Name"
-                name="companyName"
-                value={formData.companyName}
+                name="company_name"
+                value={formData.company_name}
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
               />
@@ -162,8 +164,8 @@ const SignUpPopup = () => {
               <input
                 type="email"
                 placeholder="Work Email"
-                name="workEmail"
-                value={formData.workEmail}
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
                 required

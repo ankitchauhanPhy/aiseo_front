@@ -3,11 +3,11 @@ import axiosClient from "./axiosClient";
 import type { LoginForm } from "@/type/login/loginType";
 
 export const login = async (data: LoginForm) => {
-    const response = await axiosClient.post("/login", { email: data.email, password: data.password, create: data.create});
+    const response = await axiosClient.post("/auth/login", { email: data.email, password: data.password});
     return response.data;
 };
 
 export const signup = async (data: SignUpForm) => {
-    const response = await axiosClient.post("/signup", data);
+    const response = await axiosClient.post("/auth/signup", data);
     return response.data;
 };

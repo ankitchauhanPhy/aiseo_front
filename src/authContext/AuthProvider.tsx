@@ -8,6 +8,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [firstChatText, setFirstChatText] = useState("");
   const [comparisonView, setComparisonView] = useState(false);
   const [productMatricesData, setProductMatricesData] = useState<ProductData[]>([]);
+  const [yourProductName, setYourProductName] = useState<string>("");
+  const [competitorProductName, setCompetitorProductName] = useState<any>("");
 
   const [queryID, setQueryID] = useState(0);
  
@@ -18,7 +20,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                    firstChatText, setFirstChatText,
                                    comparisonView, setComparisonView ,
                                    productMatricesData, setProductMatricesData,
-                                   queryID, setQueryID }}>
+                                   queryID, setQueryID,yourProductName,setYourProductName,
+                                   competitorProductName,setCompetitorProductName
+                                   }}>
       {children}
     </AuthContext.Provider>
   );

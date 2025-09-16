@@ -6,9 +6,10 @@ export interface SignUpProps {
 export interface SignUpForm {
   firstName: string;
   familyName: string;
-  companyName: string;
+  username: string;
+  company_name: string;
   jobRole: string;
-  workEmail: string;
+  email: string;
   password: string;
   confirmPassword: string;
   agreeTC: boolean;

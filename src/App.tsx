@@ -10,10 +10,12 @@ import ChatHistory from "./pages/chatHistory/chatHistory";
 // import ExampleVisibilityDetails from "./component/VisibilityDetails";
 import ProtectedRoute from "./component/ProtectedRoute";
 // import BarMain from "./pages/chart/BarMain";
+import { ToastProvider } from "@/components/ui/use-toast"
 
 function App() {
 
   return (
+     <ToastProvider>
     <Routes>
       {/* Wrap all pages that need Navbar in Layout */}
       <Route path="/" element={<Layout />}>
@@ -30,6 +32,7 @@ function App() {
           </ProtectedRoute>} />
       </Route>
     </Routes>
+    </ToastProvider>
   );
 }
 

@@ -184,12 +184,12 @@ const MainHistory: React.FC = () => {
 
             {/* Right Column (Rankings) */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col w-full lg:w-[40%] xl:w-[50%] ">
-              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} />
+              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} />
             </div>
           </div>
         </div>
       ) : (
-        <ComparisonView />
+        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} setOpenVisibility={setOpenVisibility} setVisibilityData={setVisibilityData}/>
       )}
       {openVisibility && (
         <ExampleVisibilityDetails openVisibility={openVisibility} setOpenVisibility={setOpenVisibility} visibilityData={visibilityData}/>

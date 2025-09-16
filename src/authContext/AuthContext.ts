@@ -37,6 +37,14 @@ export interface AuthContextType {
   setQueryID: React.Dispatch<React.SetStateAction<number>>;
   productMatricesData: ProductData[];
   setProductMatricesData: React.Dispatch<React.SetStateAction<ProductData[]>>;
+  //   latestRankings: any; // replace 'any' with proper type if you have it
+  // setLatestRankings: React.Dispatch<React.SetStateAction<any>>;
+  yourProductName: string;
+  setYourProductName: React.Dispatch<React.SetStateAction<string>>;
+  competitorProductName?: any;
+  setCompetitorProductName?: React.Dispatch<React.SetStateAction<any>>;
+  productMatricesCompetitor?: any;
+  setProductMatricesCompetitor?: React.Dispatch<React.SetStateAction<any>>;
 }
 
 // Just the context (no component here)
