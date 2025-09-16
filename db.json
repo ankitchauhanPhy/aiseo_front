@@ -1,0 +1,431 @@
+{
+  "login": [
+   
+  ],
+  "final_ranked" :[
+    {
+  "query_id": 14,
+  "product_visible": false,
+  "rankings": [
+    {
+      "product_name": "Reebok Men's Flyer Run Lp Running Shoes",
+      "final_rank": 1,
+      "borda_score": 10,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "10.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 10,
+        "borda_points": 10,
+        "source_count": 1
+      },
+      "openai_rank": 1,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Reebok Performer Lp Black Running Shoes",
+      "final_rank": 2,
+      "borda_score": 9,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "10.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 10,
+        "borda_points": 9,
+        "source_count": 1
+      },
+      "openai_rank": 2,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Adidas Men's Drogo M Running Shoes",
+      "final_rank": 3,
+      "borda_score": 8,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "9.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 9,
+        "borda_points": 8,
+        "source_count": 1
+      },
+      "openai_rank": 3,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Reebok Linea Black Running Shoes",
+      "final_rank": 4,
+      "borda_score": 7,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "9.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 9,
+        "borda_points": 7,
+        "source_count": 1
+      },
+      "openai_rank": 4,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Nike Downshifter 7",
+      "final_rank": 5,
+      "borda_score": 7,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "20.0",
+      "aggregated_data": {
+        "sources": [
+          "perplexity"
+        ],
+        "avg_score": 20,
+        "borda_points": 7,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": 1,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Fila Arrigo Grey Running Shoes",
+      "final_rank": 6,
+      "borda_score": 6,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "8.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 8,
+        "borda_points": 6,
+        "source_count": 1
+      },
+      "openai_rank": 5,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Reebok Flyer Run LP",
+      "final_rank": 7,
+      "borda_score": 6,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "18.0",
+      "aggregated_data": {
+        "sources": [
+          "perplexity"
+        ],
+        "avg_score": 18,
+        "borda_points": 6,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": 2,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Lotto Quaranta III Men's Running Shoes",
+      "final_rank": 8,
+      "borda_score": 5,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "10.0",
+      "aggregated_data": {
+        "sources": [
+          "gemini"
+        ],
+        "avg_score": 10,
+        "borda_points": 5,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": null,
+      "gemini_rank": 1
+    },
+    {
+      "product_name": "Puma Men's Enzo Mesh Running Shoes",
+      "final_rank": 9,
+      "borda_score": 5,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "8.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 8,
+        "borda_points": 5,
+        "source_count": 1
+      },
+      "openai_rank": 6,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Adidas Kivaro",
+      "final_rank": 10,
+      "borda_score": 5,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "16.0",
+      "aggregated_data": {
+        "sources": [
+          "perplexity"
+        ],
+        "avg_score": 16,
+        "borda_points": 5,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": 3,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "New Balance Men's 321 Running Shoes",
+      "final_rank": 11,
+      "borda_score": 4,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "9.0",
+      "aggregated_data": {
+        "sources": [
+          "gemini"
+        ],
+        "avg_score": 9,
+        "borda_points": 4,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": null,
+      "gemini_rank": 2
+    },
+    {
+      "product_name": "ASICS Men's Gel-Contend 4B+ Running Shoes",
+      "final_rank": 12,
+      "borda_score": 4,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "7.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 7,
+        "borda_points": 4,
+        "source_count": 1
+      },
+      "openai_rank": 7,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Puma Softride Fuzion",
+      "final_rank": 13,
+      "borda_score": 4,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "7.0",
+      "aggregated_data": {
+        "sources": [
+          "perplexity"
+        ],
+        "avg_score": 7,
+        "borda_points": 4,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": 4,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Adidas Men's Erdiga 2.0 M Running Shoes",
+      "final_rank": 14,
+      "borda_score": 3,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "8.0",
+      "aggregated_data": {
+        "sources": [
+          "gemini"
+        ],
+        "avg_score": 8,
+        "borda_points": 3,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": null,
+      "gemini_rank": 3
+    },
+    {
+      "product_name": "Fila Jameson Black Running Shoes",
+      "final_rank": 15,
+      "borda_score": 3,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "7.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 7,
+        "borda_points": 3,
+        "source_count": 1
+      },
+      "openai_rank": 8,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Puma Softride Fuzion Running Shoe",
+      "final_rank": 16,
+      "borda_score": 3,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "7.0",
+      "aggregated_data": {
+        "sources": [
+          "perplexity"
+        ],
+        "avg_score": 7,
+        "borda_points": 3,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": 5,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Nike Revolution 4 Men's Running Shoes",
+      "final_rank": 17,
+      "borda_score": 2,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "7.0",
+      "aggregated_data": {
+        "sources": [
+          "gemini"
+        ],
+        "avg_score": 7,
+        "borda_points": 2,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": null,
+      "gemini_rank": 4
+    },
+    {
+      "product_name": "Nike Ballista IV MSL Grey Running Shoes",
+      "final_rank": 18,
+      "borda_score": 2,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "6.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 6,
+        "borda_points": 2,
+        "source_count": 1
+      },
+      "openai_rank": 9,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Campus Men's Blue Running Shoes",
+      "final_rank": 19,
+      "borda_score": 2,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "6.0",
+      "aggregated_data": {
+        "sources": [
+          "perplexity"
+        ],
+        "avg_score": 6,
+        "borda_points": 2,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": 6,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Adidas Men's Legus M Running Shoes",
+      "final_rank": 20,
+      "borda_score": 1,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "6.0",
+      "aggregated_data": {
+        "sources": [
+          "gemini"
+        ],
+        "avg_score": 6,
+        "borda_points": 1,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": null,
+      "gemini_rank": 5
+    },
+    {
+      "product_name": "Nike Men's Air Profusion II",
+      "final_rank": 21,
+      "borda_score": 1,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "6.0",
+      "aggregated_data": {
+        "sources": [
+          "openai"
+        ],
+        "avg_score": 6,
+        "borda_points": 1,
+        "source_count": 1
+      },
+      "openai_rank": 10,
+      "perplexity_rank": null,
+      "gemini_rank": null
+    },
+    {
+      "product_name": "Skechers Mens Go Run Running Shoe",
+      "final_rank": 22,
+      "borda_score": 1,
+      "total_mentions": 1,
+      "source_count": 1,
+      "average_individual_rank": "6.0",
+      "aggregated_data": {
+        "sources": [
+          "perplexity"
+        ],
+        "avg_score": 6,
+        "borda_points": 1,
+        "source_count": 1
+      },
+      "openai_rank": null,
+      "perplexity_rank": 7,
+      "gemini_rank": null
+    }
+  ]
+}
+  ]
+}
