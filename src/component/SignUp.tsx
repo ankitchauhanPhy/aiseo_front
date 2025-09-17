@@ -17,11 +17,11 @@ const SignUpPopup = () => {
   const { setShowSignup, setShowLoginup } = useAuth();
 
   const [formData, setFormData] = useState<SignUpForm>({
-    firstName: "",
-    familyName: "",
+    first_name: "",
+    last_name: "",
     username:"",
     company_name: "",
-    jobRole: "",
+    job_role: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -50,7 +50,7 @@ const SignUpPopup = () => {
     // Perform signup logic here
     console.log(formData,"formData");
     try {
-      formData.username = formData.firstName + formData.familyName;
+      // formData.username = formData.firstName + formData.familyName;
       const data = await AuthAPI.signup(formData);
       console.log("Signup Success", data);
       if (data.create) {
@@ -126,17 +126,17 @@ const SignUpPopup = () => {
                 <input
                   type="text"
                   placeholder="First Name"
-                  name="firstName"
-                  value={formData.firstName}
+                  name="first_name"
+                  value={formData.first_name}
                   onChange={handleChange}
                   className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Family Name"
-                  name="familyName"
-                  value={formData.familyName}
+                  placeholder="Last Name"
+                  name="last_name"
+                  value={formData.last_name}
                   onChange={handleChange}
                   className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
                   required
@@ -155,8 +155,8 @@ const SignUpPopup = () => {
               <input
                 type="text"
                 placeholder="Job Role (eg: Marketing Manager, Business Analyst, etc)"
-                name="jobRole"
-                value={formData.jobRole}
+                name="job_role"
+                value={formData.job_role}
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
               />

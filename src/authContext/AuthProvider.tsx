@@ -10,6 +10,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [productMatricesData, setProductMatricesData] = useState<ProductData[]>([]);
   const [yourProductName, setYourProductName] = useState<string>("");
   const [competitorProductName, setCompetitorProductName] = useState<any>("");
+  const [ competitorProductVisible, setCompetitorProductVisible] = useState<boolean>(false);
 
   const [queryID, setQueryID] = useState(0);
  
@@ -21,7 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                    comparisonView, setComparisonView ,
                                    productMatricesData, setProductMatricesData,
                                    queryID, setQueryID,yourProductName,setYourProductName,
-                                   competitorProductName,setCompetitorProductName
+                                   competitorProductName,setCompetitorProductName,competitorProductVisible,setCompetitorProductVisible
                                    }}>
       {children}
     </AuthContext.Provider>

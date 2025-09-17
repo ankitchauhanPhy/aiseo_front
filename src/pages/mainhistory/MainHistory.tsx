@@ -25,7 +25,7 @@ const MainHistory: React.FC = () => {
     rankings: []
   })
   const [productVisible, setProductVisible] = useState(false);
-  const { comparisonView, queryID, setProductMatricesData} = useAuth();
+  const { comparisonView, queryID, setProductMatricesData, competitorProductVisible} = useAuth();
 
 
 

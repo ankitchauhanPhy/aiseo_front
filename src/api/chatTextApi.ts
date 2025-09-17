@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
 
 export const sendCheckQuery = async (inputValue: string) => {
-    const response = await axiosClient.post("/check_prompt", { queries: [inputValue], temperature: 0.9, max_tokens: 512, user_id: 1 });
+    const response = await axiosClient.post("/check_prompt", { queries: [inputValue], temperature: 0.9, max_tokens: 5000, user_id: 1 });
     return response;
 }
 

@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { useAuth } from "@/authContext/useAuth";
 
-
 import MainHistoryVisibilityLogo1 from "../assets/mainHistory/MainHistoryVisibilityLogo1.svg";
-import MainHistoryVisibilityLogo2 from "../assets/mainHistory/MainHistoryVisibilityLogo2.svg"
-import MainHistoryVisibilityLogo4 from "../assets/mainHistory/MainHistoryVisibilityLogo4.svg"
+import MainHistoryVisibilityLogo2 from "../assets/mainHistory/MainHistoryVisibilityLogo2.svg";
+import MainHistoryVisibilityLogo4 from "../assets/mainHistory/MainHistoryVisibilityLogo4.svg";
 
 interface VisibilityDetailsProps {
   title: string;
@@ -21,7 +20,7 @@ interface VisibilityDetailsProps {
 
 interface Examplevisibility {
   openVisibility: boolean;
-  setOpenVisibility: React.Dispatch<React.SetStateAction<boolean>>
+  setOpenVisibility: React.Dispatch<React.SetStateAction<boolean>>;
   visibilityData: string;
 }
 
@@ -37,7 +36,6 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
   onClose,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-
 
   // Close on Escape
   useEffect(() => {
@@ -95,7 +93,15 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
               <div className="w-10 h-10 bg-black rounded-l-md flex items-center justify-center">
                 <img src={`${icon}`} alt={title} className="w-10 h-10" />
               </div>
-              <div className={`${title === "Gemini" ? "bg-[#F97316] " : title === "OpenAI" ? "bg-[#A855F7]" : "bg-[#3B82F6]"} rounded-r-md px-3 py-2 text-white font-semibold text-sm w-[200px]`}>
+              <div
+                className={`${
+                  title === "Gemini"
+                    ? "bg-[#F97316] "
+                    : title === "OpenAI"
+                    ? "bg-[#A855F7]"
+                    : "bg-[#3B82F6]"
+                } rounded-r-md px-3 py-2 text-white font-semibold text-sm w-[200px]`}
+              >
                 {count}
               </div>
             </div>
@@ -108,31 +114,36 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
             >
               {/* note the "transform" + rotate classes */}
               <ChevronDown
-                className={`w-5 h-5 text-gray-500 transform transition-transform ${isExpanded ? "rotate-180" : "rotate-0"
-                  }`}
+                className={`w-5 h-5 text-gray-500 transform transition-transform ${
+                  isExpanded ? "rotate-180" : "rotate-0"
+                }`}
               />
             </button>
           </div>
 
           {/* Expandable content */}
-          <div id="visibility-details" className={isExpanded ? "block" : "hidden"}>
+          <div
+            id="visibility-details"
+            className={isExpanded ? "block" : "hidden"}
+          >
             {/* Citations */}
             <div className="mb-3">
               <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 {citationsFound} citations found
               </h3>
               <div className="space-y-2 text-sm">
-                {citationUrls && citationUrls.map((url, i) => (
-                  <a
-                    key={i}
-                    href={url}
-                    className="text-blue-600 hover:text-blue-800 break-all block"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {url}
-                  </a>
-                ))}
+                {citationUrls &&
+                  citationUrls.map((url, i) => (
+                    <a
+                      key={i}
+                      href={url}
+                      className="text-blue-600 hover:text-blue-800 break-all block"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {url}
+                    </a>
+                  ))}
               </div>
             </div>
 
@@ -142,14 +153,15 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
                 {categoriesFound} categories found
               </h3>
               <div className="flex flex-wrap gap-2">
-                {categories && categories.map((c, i) => (
-                  <span
-                    key={i}
-                    className="text-gray-600 text-xs font-medium px-2 py-1 bg-gray-100 rounded"
-                  >
-                    {c}
-                  </span>
-                ))}
+                {categories &&
+                  categories.map((c, i) => (
+                    <span
+                      key={i}
+                      className="text-gray-600 text-xs font-medium px-2 py-1 bg-gray-100 rounded"
+                    >
+                      {c}
+                    </span>
+                  ))}
               </div>
             </div>
           </div>
@@ -160,8 +172,16 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
 };
 
 /* Example parent that opens the modal */
-const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({ openVisibility, setOpenVisibility, visibilityData }) => {
-  const { productMatricesData } = useAuth();
+const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
+  openVisibility,
+  setOpenVisibility,
+  visibilityData,
+}) => {
+  const {
+    productMatricesData,
+    competitorProductVisible,
+    productMatricesCompetitor,
+  } = useAuth();
 
   console.log("productMetricesData in visibility", productMatricesData);
   let mockIcon;
@@ -169,34 +189,47 @@ const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({ openVisibility,
   if (visibilityData === "Perplexity") {
     mockIcon = MainHistoryVisibilityLogo1;
     count = productMatricesData[0]?.mentions_by_platform?.perplexity;
-  }
-  else if (visibilityData === "OpenAI") {
+  } else if (visibilityData === "OpenAI") {
     mockIcon = MainHistoryVisibilityLogo2;
-     count = productMatricesData[0]?.mentions_by_platform?.openai;
-
+    count = productMatricesData[0]?.mentions_by_platform?.openai;
   } else if (visibilityData === "Gemini") {
     mockIcon = MainHistoryVisibilityLogo4;
-     count = productMatricesData[0]?.mentions_by_platform?.gemini;
+    count = productMatricesData[0]?.mentions_by_platform?.gemini;
   }
 
   const platformKey = visibilityData.toLowerCase();
-  const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
+  //const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
+console.log("202=======",productMatricesCompetitor,competitorProductVisible)
+  const citationUrls =
+    (competitorProductVisible
+      ? productMatricesCompetitor
+      : productMatricesData)[0]?.citations?.[platformKey] ?? [];
+
   const sampleData = {
     title: visibilityData,
     icon: mockIcon,
     count: count,
     // citationsFound: productMatricesData[0]?.citations.visibilityData.length,
     citationsFound: citationUrls.length,
-    citationUrls, 
-    categoriesFound: productMatricesData[0]?.categories.length ?? 0,
-    categories: productMatricesData[0]?.categories ?? [],
+    citationUrls,
+    categoriesFound:
+      (competitorProductVisible
+        ? productMatricesCompetitor
+        : productMatricesData)[0]?.categories?.length ?? 0,
+    categories:
+      (competitorProductVisible
+        ? productMatricesCompetitor
+        : productMatricesData)[0]?.categories ?? [],
     monthlyChange: "+30% this month",
   };
 
   return (
     <>
       {openVisibility && (
-        <VisibilityDetails {...sampleData} onClose={() => setOpenVisibility(false)} />
+        <VisibilityDetails
+          {...sampleData}
+          onClose={() => setOpenVisibility(false)}
+        />
       )}
     </>
   );
