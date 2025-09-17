@@ -185,12 +185,12 @@ const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
   }
 
   const platformKey = visibilityData.toLowerCase();
-  //const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
+  const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
 console.log("202=======",productMatricesCompetitor,competitorProductVisible)
-  const citationUrls =
-    (competitorProductVisible
-      ? productMatricesCompetitor
-      : productMatricesData)[0]?.citations?.[platformKey] ?? [];
+  // const citationUrls =
+  //   (competitorProductVisible
+  //     ? productMatricesCompetitor
+  //     : productMatricesData)[0]?.citations?.[platformKey] ?? [];
 
   const sampleData = {
     title: visibilityData,
@@ -200,13 +200,8 @@ console.log("202=======",productMatricesCompetitor,competitorProductVisible)
     citationsFound: citationUrls.length,
     citationUrls,
     categoriesFound:
-      (competitorProductVisible
-        ? productMatricesCompetitor
-        : productMatricesData)[0]?.categories?.length ?? 0,
-    categories:
-      (competitorProductVisible
-        ? productMatricesCompetitor
-        : productMatricesData)[0]?.categories ?? [],
+         productMatricesData[0]?.categories?.length ,
+    categories: productMatricesData[0]?.categories ?? [],
     monthlyChange: "+30% this month",
   };
 
