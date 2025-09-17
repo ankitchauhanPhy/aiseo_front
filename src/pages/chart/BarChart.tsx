@@ -156,6 +156,7 @@ const BarChart: React.FC<VisibilityProps> = ({ setOpenVisibility, setVisibilityD
   const dataValues = [0, 0, 0]
 
   const { productMatricesData } = useAuth();
+  console.log("productMatricesData in barchart", productMatricesData);
   useEffect(() => {
     if (productMatricesData.length > 0) {
       labels.map((items, i) => {

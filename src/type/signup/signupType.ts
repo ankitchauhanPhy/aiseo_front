@@ -4,11 +4,12 @@ export interface SignUpProps {
 }
 
 export interface SignUpForm {
-  firstName: string;
-  familyName: string;
-  companyName: string;
-  jobRole: string;
-  workEmail: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  company_name: string;
+  job_role: string;
+  email: string;
   password: string;
   confirmPassword: string;
   agreeTC: boolean;

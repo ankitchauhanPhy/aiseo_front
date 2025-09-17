@@ -38,7 +38,6 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-
   // Close on Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -160,8 +159,16 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
 };
 
 /* Example parent that opens the modal */
-const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({ openVisibility, setOpenVisibility, visibilityData }) => {
-  const { productMatricesData } = useAuth();
+const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
+  openVisibility,
+  setOpenVisibility,
+  visibilityData,
+}) => {
+  const {
+    productMatricesData,
+    competitorProductVisible,
+    productMatricesCompetitor,
+  } = useAuth();
 
   console.log("productMetricesData in visibility", productMatricesData);
   let mockIcon;
@@ -169,34 +176,47 @@ const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({ openVisibility,
   if (visibilityData === "Perplexity") {
     mockIcon = MainHistoryVisibilityLogo1;
     count = productMatricesData[0]?.mentions_by_platform?.perplexity;
-  }
-  else if (visibilityData === "OpenAI") {
+  } else if (visibilityData === "OpenAI") {
     mockIcon = MainHistoryVisibilityLogo2;
-     count = productMatricesData[0]?.mentions_by_platform?.openai;
-
+    count = productMatricesData[0]?.mentions_by_platform?.openai;
   } else if (visibilityData === "Gemini") {
     mockIcon = MainHistoryVisibilityLogo4;
-     count = productMatricesData[0]?.mentions_by_platform?.gemini;
+    count = productMatricesData[0]?.mentions_by_platform?.gemini;
   }
 
   const platformKey = visibilityData.toLowerCase();
-  const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
+  //const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
+console.log("202=======",productMatricesCompetitor,competitorProductVisible)
+  const citationUrls =
+    (competitorProductVisible
+      ? productMatricesCompetitor
+      : productMatricesData)[0]?.citations?.[platformKey] ?? [];
+
   const sampleData = {
     title: visibilityData,
     icon: mockIcon,
     count: count,
     // citationsFound: productMatricesData[0]?.citations.visibilityData.length,
     citationsFound: citationUrls.length,
-    citationUrls, 
-    categoriesFound: productMatricesData[0]?.categories.length ?? 0,
-    categories: productMatricesData[0]?.categories ?? [],
+    citationUrls,
+    categoriesFound:
+      (competitorProductVisible
+        ? productMatricesCompetitor
+        : productMatricesData)[0]?.categories?.length ?? 0,
+    categories:
+      (competitorProductVisible
+        ? productMatricesCompetitor
+        : productMatricesData)[0]?.categories ?? [],
     monthlyChange: "+30% this month",
   };
 
   return (
     <>
       {openVisibility && (
-        <VisibilityDetails {...sampleData} onClose={() => setOpenVisibility(false)} />
+        <VisibilityDetails
+          {...sampleData}
+          onClose={() => setOpenVisibility(false)}
+        />
       )}
     </>
   );

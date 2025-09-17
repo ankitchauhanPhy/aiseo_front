@@ -17,11 +17,12 @@ const SignUpPopup = () => {
   const { setShowSignup, setShowLoginup } = useAuth();
 
   const [formData, setFormData] = useState<SignUpForm>({
-    firstName: "",
-    familyName: "",
-    companyName: "",
-    jobRole: "",
-    workEmail: "",
+    first_name: "",
+    last_name: "",
+    username:"",
+    company_name: "",
+    job_role: "",
+    email: "",
     password: "",
     confirmPassword: "",
     agreeTC: false,
@@ -47,8 +48,9 @@ const SignUpPopup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Perform signup logic here
-    console.log(formData);
+    console.log(formData,"formData");
     try {
+      // formData.username = formData.firstName + formData.familyName;
       const data = await AuthAPI.signup(formData);
       console.log("Signup Success", data);
       if (data.create) {
@@ -105,7 +107,7 @@ const SignUpPopup = () => {
             <button
               type="button"
               className="flex items-center gap-1 text-sm text-[#7C3BED] hover:text-purple-400 mb-4"
-              onClick={() => {setShowSignup(false); setShowLoginup(true);}}
+              onClick={() => alert("Back to Login")}
             >
               <RiArrowLeftSLine className="text-lg" />
               Back to Login
@@ -124,17 +126,17 @@ const SignUpPopup = () => {
                 <input
                   type="text"
                   placeholder="First Name"
-                  name="firstName"
-                  value={formData.firstName}
+                  name="first_name"
+                  value={formData.first_name}
                   onChange={handleChange}
                   className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Family Name"
-                  name="familyName"
-                  value={formData.familyName}
+                  placeholder="Last Name"
+                  name="last_name"
+                  value={formData.last_name}
                   onChange={handleChange}
                   className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
                   required
@@ -144,8 +146,8 @@ const SignUpPopup = () => {
               <input
                 type="text"
                 placeholder="Company Name"
-                name="companyName"
-                value={formData.companyName}
+                name="company_name"
+                value={formData.company_name}
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
               />
@@ -153,8 +155,8 @@ const SignUpPopup = () => {
               <input
                 type="text"
                 placeholder="Job Role (eg: Marketing Manager, Business Analyst, etc)"
-                name="jobRole"
-                value={formData.jobRole}
+                name="job_role"
+                value={formData.job_role}
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
               />
@@ -162,8 +164,8 @@ const SignUpPopup = () => {
               <input
                 type="email"
                 placeholder="Work Email"
-                name="workEmail"
-                value={formData.workEmail}
+                name="email"
+                value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
                 required

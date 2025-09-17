@@ -43,8 +43,12 @@ const LoginPopup = () => {
     try {
       const data = await AuthAPI.login(formData);
       console.log("Login Success", data);
-      if (showLoginup) {
+      if (data.access_token) {
         localStorage.setItem("login", "true");
+        localStorage.setItem("company_name", data.user.company_name);
+        localStorage.setItem("use_iD", data.user.id);
+        localStorage.setItem("Name", data.user.username);
+
         alert("Login Successfull!")
         setShowLoginup(false);
         setLoginType(true);

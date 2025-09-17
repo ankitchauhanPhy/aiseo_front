@@ -47,6 +47,16 @@ export interface AuthContextType {
   setProductMatricesData: React.Dispatch<React.SetStateAction<ProductData[]>>;
    conversationData: ConversationsResponse | null;
   setConversationData: React.Dispatch<React.SetStateAction<ConversationsResponse | null>>;
+  //   latestRankings: any; // replace 'any' with proper type if you have it
+  // setLatestRankings: React.Dispatch<React.SetStateAction<any>>;
+  yourProductName: string;
+  setYourProductName: React.Dispatch<React.SetStateAction<string>>;
+  competitorProductName?: any;
+  setCompetitorProductName?: React.Dispatch<React.SetStateAction<any>>;
+  productMatricesCompetitor?: any;
+  setProductMatricesCompetitor?: React.Dispatch<React.SetStateAction<any>>;
+  competitorProductVisible: boolean;
+  setCompetitorProductVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Just the context (no component here)

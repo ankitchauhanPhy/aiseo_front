@@ -346,8 +346,6 @@ const ChatHistory: React.FC = () => {
         <div className="flex-1 p-6 overflow-y-auto flex flex-col-reverse">
           <div className="space-y-6">
             {chat.map((item, index) => {
-              const isLatestAI = item.id !== "user" && index === 0 && loading;
-              console.log("isLatestAI", isLatestAI);
               return (
                 <div
                   key={index}
@@ -363,7 +361,7 @@ const ChatHistory: React.FC = () => {
                       Loading...
                     </div>
                   ) : (
-                    <ChatMessage text={item.title} />
+                    <ChatMessage text={item.loading ? "Typing": item.title} />
                   )}
                 </div>
               );

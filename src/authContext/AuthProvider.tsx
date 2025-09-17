@@ -12,6 +12,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
  const [conversationData, setConversationData] = useState<ConversationsResponse| null>(null);
  
+  const [yourProductName, setYourProductName] = useState<string>("");
+  const [competitorProductName, setCompetitorProductName] = useState<any>("");
+  const [ competitorProductVisible, setCompetitorProductVisible] = useState<boolean>(false);
+
  
 
   return (
@@ -20,8 +24,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                    firstChatText, setFirstChatText,
                                    comparisonView, setComparisonView ,
                                    productMatricesData, setProductMatricesData,
-                                   queryID, setQueryID,
-                                   conversationData, setConversationData }}>
+                                   conversationData, setConversationData,
+                                   queryID, setQueryID,yourProductName,setYourProductName,
+                                   competitorProductName,setCompetitorProductName,competitorProductVisible,setCompetitorProductVisible
+                                   }}>
       {children}
     </AuthContext.Provider>
   );

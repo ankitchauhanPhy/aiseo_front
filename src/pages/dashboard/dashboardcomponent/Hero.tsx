@@ -245,7 +245,7 @@ export default function HeroSection() {
     if (loginStatus === "true") {
      
       setLoginType(true);
-      setShowPopup(true);
+      setShowPopup(false);
       //nav("/index")
     } else {
       setLoginType(false);

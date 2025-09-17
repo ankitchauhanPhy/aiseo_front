@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Rankings from "../../../components/ui/popup";
 
 interface Competitor {
   name: string
@@ -50,6 +51,7 @@ interface RankingTableProps {
   },
   productVisible: boolean;
   productMatrices: (queryID: number, productName: string) => void;
+  setProductVisible: (val: boolean) => void; 
 }
 
 function getRankingColor(rank: number): string {
@@ -110,9 +112,11 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
   )
 }
 
-const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productVisible, productMatrices }) => {
+const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productVisible, productMatrices, setProductVisible }) => {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const { setComparisonView, queryID } = useAuth();
+  const { setComparisonView, queryID,yourProductName,setYourProductName,setCompetitorProductName } = useAuth();
+  const [openDemo, setOpenDemo] = useState(false);
+  const [yourProduct, setYourProduct] = useState<any>(null);
 
   const dummyName: string = "Reebok Performer";
 
@@ -121,7 +125,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
       const formatted: Competitor[] = optimizationRank.rankings.map((r) => ({
         name: r.product_name,
         overallRank: r.final_rank,
-        isYou: false ,
+        isYou: false,
         rankings: {
           openAI: r.openai_rank,
           gemini: r.gemini_rank ?? 0,
@@ -131,9 +135,9 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
       setCompetitors(formatted);
     }
   }, [optimizationRank]);
-
+console.log("Your Product:", yourProduct);
   return (
-    <>
+    <>   
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col ">
         {/* Shared Scroll Container */}
         <div className="overflow-x-auto flex-1 flex flex-col">
@@ -176,11 +180,15 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
               {competitors.map((competitor, index) => (
                 <div
                   key={index}
-                  className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] ${competitor.isYou ? "bg-purple-200" : "hover:bg-purple-200"
-                    } cursor-pointer`}
+               className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] 
+  ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-purple-200"} 
+  cursor-pointer`}
+
                   onClick={() => {
                     
                     if (!productVisible) {
+                      setYourProduct(competitor.name)
+                      setYourProductName(competitor.name)
                       setCompetitors(prev =>
                       prev.map((c, i) => ({
                         ...c,
@@ -191,6 +199,9 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
 
                     } else if (productVisible) {
                       setComparisonView(true)
+                       setOpenDemo(true)
+                       setProductVisible(false)
+                      setCompetitorProductName?.(competitor.name)
                     }
                   }}
                 >
@@ -261,6 +272,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
           </div>
         </div>
       </div>
+      <Rankings open={openDemo} onOpenChange={setOpenDemo} competitor={""} />
     </>
   )
 }
