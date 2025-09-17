@@ -19,7 +19,7 @@ const SignUpPopup = () => {
   const [formData, setFormData] = useState<SignUpForm>({
     first_name: "",
     last_name: "",
-    username:"",
+    username: "",
     company_name: "",
     job_role: "",
     email: "",
@@ -48,7 +48,7 @@ const SignUpPopup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Perform signup logic here
-    console.log(formData,"formData");
+    console.log(formData, "formData");
     try {
       // formData.username = formData.firstName + formData.familyName;
       const data = await AuthAPI.signup(formData);
@@ -93,11 +93,11 @@ const SignUpPopup = () => {
           style={{ backgroundImage: `url(${SignupRocketBg})` }}
         >
           <div className="bg-[#7C3BED] text-white text-xs px-4 py-1 rounded-full mb-6">
-            ✨ The Future of Search
+            ✨ Organic Growth, Reinvented
           </div>
           <img src={SignupRocket} alt="Rocket" className="w-40 h-40 mb-6" />
           <h2 className="text-4xl font-bold leading-snug text-left">
-            The New <br /> Frontier for <br /> Organic Growth
+            Turn AI search into your next growth channel.
           </h2>
         </div>
 
@@ -114,11 +114,11 @@ const SignUpPopup = () => {
             </button>
 
 
-            <h2 className="text-3xl font-bold mb-2 text-center md:whitespace-nowrap">Sign Up</h2>
+            <h2 className="text-xl font-bold mb-2 text-center md:whitespace-nowrap">Start Your <br /> Free Trial Today</h2>
             <p
               className="text-center font-normal text-[16px] leading-[150%] tracking-[-0.03em] font-inter text-black mb-6"
             >
-              Let’s Start the Journey to Growth together!
+              No credit card required. Get instant access in under 2 minutes
             </p>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -201,13 +201,13 @@ const SignUpPopup = () => {
                       name="agreeTC"
                       checked={formData.agreeTC}
                       onChange={handleChange}
-                      className="accent-purple-500"
+                      className="accent-purple-500 mr-5"
                     />
-                    I’ve read and agreed to{" "}
+                    I agree to the Terms & Conditions and the Privacy Policy
                     <span className="text-purple-400 cursor-pointer">T&C</span>
                   </label>
 
-                  <label className="flex items-center gap-2">
+                  {/* <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       name="subscribe"
@@ -216,7 +216,7 @@ const SignUpPopup = () => {
                       className="accent-purple-500"
                     />
                     I want to subscribe to the newsletter
-                  </label>
+                  </label> */}
                 </div>
 
                 {/* Right side (forget password) */}
@@ -234,7 +234,7 @@ const SignUpPopup = () => {
                 type="submit"
                 className="w-full bg-[#7C3BED] hover:bg-purple-700 py-2 rounded-md font-semibold mt-4 transition text-white"
               >
-                Create Account
+                Create Free Account
               </button>
             </form>
           </div>

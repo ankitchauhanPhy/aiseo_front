@@ -108,6 +108,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 }) => {
   const { isLoading, error, isDataReady } = useProductMatrices();
   const { competitorProductVisible,setCompetitorProductVisible } = useAuth();
+  
   setCompetitorProductVisible(true);
   if (isLoading) {
     return (

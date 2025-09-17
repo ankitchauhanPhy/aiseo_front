@@ -37,7 +37,7 @@ const ChatHistory: React.FC = () => {
   const [title, setTitle] = useState<string>("");
 
 
-  const { firstChatText, queryID, setQueryID, conversationData, setConversationData } = useAuth();
+  const { firstChatText,setFirstChatText, queryID, setQueryID, conversationData, setConversationData } = useAuth();
 
   const nav = useNavigate();
   const location = useLocation();
@@ -260,6 +260,8 @@ const ChatHistory: React.FC = () => {
   // --------------------------
   // On First Render → add user input and call API
   // --------------------------
+
+
   useEffect(() => {
     if (firstChatText && chat.length === 0) {
       // Push initial user chat
@@ -267,12 +269,17 @@ const ChatHistory: React.FC = () => {
       // Push AI placeholder
       setChat(prev => [...prev, { id: "assistant", title: "", loading: true }]);
       callChatTextAPI(firstChatText);
+      setFirstChatText("");
+      setCheckProcessStep(false);
     } else {
       // alert("Please Write something !");
       // nav("/");
       // setChat(chatdata);
     }
   }, [])
+
+
+ 
 
   // --------------------------
   // Handle User Send Message

@@ -14,7 +14,7 @@ const LoginPopup = () => {
   const nav = useNavigate();
 
   //get Context Value
-  const { setShowSignup, setShowLoginup, setLoginType, firstChatText, showLoginup} = useAuth();
+  const { setShowSignup, setShowLoginup, setLoginType, firstChatText} = useAuth();
 
   const [formData, setFormData] = useState<LoginForm>({
     email: "",
@@ -93,11 +93,11 @@ const LoginPopup = () => {
           }}
         >
           <div className="bg-[#7C3BED] w-fit text-white text-xs px-4 py-1 rounded-full mb-6">
-            ✨ The Future of Search
+            ✨ Back to Growth
           </div>
           <img src={LoginRocket} alt="Rocket" className="w-40 h-40 mb-6" />
           <h2 className="text-4xl font-bold leading-snug text-left">
-            The New <br /> Frontier for <br /> Organic Growth
+           Log in and continue your <br/>AI SEO journey.
           </h2>
         </div>
 
@@ -106,7 +106,7 @@ const LoginPopup = () => {
           <div className="w-full max-w-md">
             <h2 className="text-[28px] font-bold mb-2 text-center">Login</h2>
             <p className="text-center text-[#333333] font-normal mb-8">
-              <span className="text-[#7C3BED] font-bold">Welcome back!</span> <br /> Let’s quickly start ranking our product
+              <span className="text-[#7C3BED] font-bold">Welcome back!</span> <br /> Secure access to your AI SEO dashboard.
             </p>
 
             {/* Form */}
@@ -156,7 +156,7 @@ const LoginPopup = () => {
 
               <button
                 type="button"
-                className="w-full border border-gray-400 py-2 rounded-md font-semibold text-[14px] hover:bg-white hover:text-black transition"
+                className="w-full border border-gray-400 py-2 rounded-md font-semibold text-[14px] bg-white  hover:bg-purple-700 text-black hover:text-white transition"
                 onClick={() => { setShowSignup(true); setShowLoginup(false) }}
               >
                 Create an Account
