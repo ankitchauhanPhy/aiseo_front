@@ -102,7 +102,7 @@ const SignUpPopup = () => {
         </div>
 
         {/* Right Panel */}
-        <div className="flex flex-col justify-center items-center w-full md:w-1/2 bg-white text-black px-8 py-5  md:rounded-r-lg ">
+        <div  className="flex flex-col justify-center items-center w-full md:w-1/2 bg-white text-black px-8 py-5  md:rounded-r-lg ">
           <div className="w-full max-w-md">
             <button
               type="button"
