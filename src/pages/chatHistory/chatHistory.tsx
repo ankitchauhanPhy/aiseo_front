@@ -34,6 +34,7 @@ const ChatHistory: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [chat, setChat] = useState<ChatItem[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<number>(0);
+  const [title, setTitle] = useState<string>("");
 
 
   const { firstChatText, queryID, setQueryID, conversationData, setConversationData } = useAuth();
@@ -65,7 +66,7 @@ const ChatHistory: React.FC = () => {
         if (response?.data.conversation && Array.isArray(response.data.conversation)) {
 
           // ✅ Remove last 3
-        const withoutLastThree = response.data.conversation.slice(0, -3);
+          const withoutLastThree = response.data.conversation.slice(0, -3);
 
           // Transform API conversation → ChatItem[]
           const formattedChat: ChatItem[] = withoutLastThree.map((c: ApiConversation) => ({
@@ -101,7 +102,7 @@ const ChatHistory: React.FC = () => {
   }
 
   useEffect(() => {
-      getAllHistory();
+    getAllHistory();
   }, [])
 
   const handleSelectHistory = (userId: number, conversationId: number) => {
@@ -321,7 +322,7 @@ const ChatHistory: React.FC = () => {
                 key={c.conversation_id}
                 className={`p-4 hover:bg-gray-300 rounded-lg cursor-pointer  ${selectedConversationId === c.conversation_id ? "bg-gray-400" : ""}`}
                 // onClick={() => { singleHistory(1, c.conversation_id); setSelectedHistory(true); setSelectedConversationId(c.conversation_id) }}
-                onClick={() => handleSelectHistory(1, c.conversation_id)}
+                onClick={() => {handleSelectHistory(1, c.conversation_id);setTitle(c.last_user_query) }}
               >
                 <h3 className="text-black text-sm font-medium mb-1">
                   {c.last_user_query}
@@ -340,7 +341,7 @@ const ChatHistory: React.FC = () => {
       <div className="mr-5 ml-10 flex-1 rounded-lg flex flex-col h-full md:overflow-hidden ">
         {/* Header */}
         <div className="border-b p-3 border-gray-300 flex-shrink-0">
-          <h1 className="text-xl font-medium">{chat.length > 0 ? chat[chat.length-1].title : "Chat History"}</h1>
+          <h1 className="text-xl font-medium">{title ? title : "Chat History"}</h1>
         </div>
 
         <div className="flex-1 p-6 overflow-y-auto flex flex-col-reverse">
@@ -361,7 +362,13 @@ const ChatHistory: React.FC = () => {
                       Loading...
                     </div>
                   ) : (
-                    <ChatMessage text={item.loading ? "Typing": item.title} />
+                    // <ChatMessage text={item.loading ? "Typing": item.title} />
+                    // AFTER (fixed):
+                    item.id === "user" ? (
+                      <div>{item.title}</div>
+                    ) : (
+                      <ChatMessage text={item.title} />
+                    )
                   )}
                 </div>
               );

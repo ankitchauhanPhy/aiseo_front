@@ -58,7 +58,7 @@ export default function MentionBar() {
   useEffect(() => {
     if (productMatricesData.length > 0) {
       platformData.map((item) => {
-        const temp = item.name.toLowerCase();
+        const temp = item.name.toLowerCase().replace(" ","");
 
         // dynamic key lookup
         item.mentions = productMatricesData[0].mentions_by_platform[temp]
