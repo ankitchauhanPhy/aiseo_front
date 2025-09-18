@@ -180,10 +180,10 @@ console.log("Your Product:", yourProduct);
               {competitors.map((competitor, index) => (
                 <div
                   key={index}
-               className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] 
-  ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-purple-200"} 
-  cursor-pointer`}
-
+                  data-tour={`ranking-row-${index}`} 
+                  className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] 
+                   ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-purple-200"} 
+      cursor-pointer`}
                   onClick={() => {
                     
                     if (!productVisible) {

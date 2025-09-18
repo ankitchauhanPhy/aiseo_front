@@ -10,6 +10,7 @@ import { ChatTextAPI, HistoryAPI } from '@/api';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ChatMessage from '@/component/ChatMessage';
 import { useOnboarding } from '@/context/OnboardingProvider';
+import ExpandableInput from '@/component/ExpandableInput';
 
 interface ChatItem {
   id: string;
@@ -32,7 +33,7 @@ const ChatHistory: React.FC = () => {
 
   // Joyride states
   const { startTour } = useOnboarding();
-  const [run, setRun] = useState(true);
+  // const [run, setRun] = useState(true);
 
   const steps: Step[] = [
     {
@@ -54,6 +55,7 @@ const ChatHistory: React.FC = () => {
   ];
 
   const [inputValue, setInputValue] = useState('');
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [checkProcessStep, setCheckProcessStep] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -127,11 +129,15 @@ const ChatHistory: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    if (!localStorage.getItem("chatHistoryTourDone")) {
+  if (!localStorage.getItem("chatHistoryTourDone")) {
+    const timer = setTimeout(() => {
       startTour(steps);
       localStorage.setItem("chatHistoryTourDone", "true");
-    }
-  }, []);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }
+}, []);
 
 
   const handleSelectHistory = (userId: number, conversationId: number) => {
@@ -482,6 +488,8 @@ const ChatHistory: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* <ExpandableInput/> */}
+
       </div >
     </div >
   );

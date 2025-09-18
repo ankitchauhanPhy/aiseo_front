@@ -8,8 +8,8 @@ interface OnboardingContextType {
 }
 
 const OnboardingContext = createContext<OnboardingContextType>({
-  startTour: () => {},
-  stopTour: () => {},
+  startTour: () => { },
+  stopTour: () => { },
 });
 
 export const useOnboarding = () => useContext(OnboardingContext);
@@ -131,9 +131,17 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         run={run}
         continuous
         showSkipButton
+        locale={{
+          back: 'Back',
+          close: 'Close',
+          last: 'Ok', 
+          next: 'Next',
+          skip: 'Skip'
+        }}
         showProgress
         disableOverlayClose
         spotlightClicks
+        disableBeacon={true}
         styles={joyrideStyles}
         callback={(data) => {
           // Stop tour automatically if finished
