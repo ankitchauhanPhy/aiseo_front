@@ -31,7 +31,8 @@ export default function HeroSection() {
     conversationData,
     freeTrialPopup,
     setFreeTrialPopup,
-    firstChatText
+    firstChatText,
+    setComparisonView
   } = useAuth();
 
   const nav = useNavigate();
@@ -60,6 +61,7 @@ export default function HeroSection() {
   useEffect(() => {
     const loginStatus = localStorage.getItem("login");
     if (loginStatus === "true") {
+      setComparisonView(false);
       setLoginType(true);
       setFreeTrialPopup(false);
     } else {

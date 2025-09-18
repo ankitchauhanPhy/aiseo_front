@@ -7,6 +7,7 @@ import ProtectedRoute from "./component/ProtectedRoute";
 import HeroSection from "./pages/dashboard/dashboardcomponent/Hero";
 
 import {ToastContainer}  from "react-toastify";
+import NoDataFound from "./component/noDataFound/NoDataFound";
 
 
 
@@ -33,6 +34,7 @@ function App() {
       {/* Wrap all pages that need Navbar in Layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Dashboard />} />
+        <Route path="/no" element={<NoDataFound />} />
         <Route path="/index" element={
           <ProtectedRoute>
             <HeroSection />

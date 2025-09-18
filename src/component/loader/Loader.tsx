@@ -12,7 +12,7 @@ const Loader: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full space-y-4">
-      <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-0"></div>
+      {/* <div className="absolute inset-0 bg-black/10 backdrop-blur-sm z-0"></div> */}
       {/* Spinner */}
       <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin z-10"></div>
 

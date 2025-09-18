@@ -3,13 +3,12 @@ import { History, ChevronRight, Loader2 } from 'lucide-react';
 
 import ChatHistoryLoading from "../../assets/chatHistory/ChatHistoryLoading.gif"
 import { useAuth } from '@/authContext/useAuth';
-// import { useNavigate } from 'react-router-dom';
 import { ChatTextAPI, HistoryAPI } from '@/api';
-// import ChatMessage from '@/component/ChatMessage';
-import { useLocation, useNavigate } from 'react-router-dom';
 import ChatMessage from '@/component/ChatMessage';
 
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
+import Loader from '@/component/loader/Loader';
+import { useNavigate } from 'react-router-dom';
 
 
 interface ChatItem {
@@ -24,10 +23,10 @@ interface Step {
   completed: boolean;
   active: boolean;
 }
-interface ApiConversation {
-  role: "user" | "assistant";
-  message: string;
-}
+// interface ApiConversation {
+//   role: "user" | "assistant";
+//   message: string;
+// }
 
 const ChatHistory: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -35,18 +34,13 @@ const ChatHistory: React.FC = () => {
   const [checkProcessStep, setCheckProcessStep] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [chat, setChat] = useState<ChatItem[]>([]);
-  const [selectedConversationId, setSelectedConversationId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
+  const [historyLoading, setHistoryLoading] = useState<boolean>(false);
+ const nav = useNavigate();
 
+  const { firstChatText, setFirstChatText, queryID, setQueryID, conversationData, setConversationData, setComparisonView } = useAuth();
 
-  const { firstChatText,setFirstChatText, queryID, setQueryID, conversationData, setConversationData } = useAuth();
-
-  const nav = useNavigate();
-  const location = useLocation();
-  const { userId, conversationId } = location.state || {};
-
-  console.log("userId52", userId, "conversationId", conversationId);
-
+ 
   console.log("error", error);
   const [processSteps, setProcessSteps] = useState<Step[]>([
     { id: 1, text: 'Creating Queries', badge: 'Query 1', completed: false, active: true },
@@ -57,49 +51,50 @@ const ChatHistory: React.FC = () => {
     { id: 6, text: 'Done', completed: false, active: false },
   ]);
 
-  async function singleHistory(userId: number, conversationID: number) {
-    try {
+  // async function singleHistory(userId: number, conversationID: number) {
+  //   try {
 
-      const response = await HistoryAPI.getSinglehistory(userId, conversationID);
-      console.log("API Response:", response);
-      if (response.statusText) {
-        if (response?.data.conversation && Array.isArray(response.data.conversation)) {
+  //     const response = await HistoryAPI.getSinglehistory(userId, conversationID);
+  //     console.log("API Response:", response);
+  //     if (response.statusText) {
+  //       if (response?.data.conversation && Array.isArray(response.data.conversation)) {
 
-          // ✅ Remove last 3
-          const withoutLastThree = response.data.conversation.slice(0, -3);
+  //         // ✅ Remove last 3
+  //         const withoutLastThree = response.data.conversation.slice(0, -3);
 
-          // Transform API conversation → ChatItem[]
-          const formattedChat: ChatItem[] = withoutLastThree.map((c: ApiConversation) => ({
-            id: c.role,            // "user" | "assistant"
-            title: c.message,      // message text
-            loading: false         // always false here
-          }));
+  //         // Transform API conversation → ChatItem[]
+  //         const formattedChat: ChatItem[] = withoutLastThree.map((c: ApiConversation) => ({
+  //           id: c.role,            // "user" | "assistant"
+  //           title: c.message,      // message text
+  //           loading: false         // always false here
+  //         }));
 
-          setChat(formattedChat);
-        }
-      }
-    } catch (err: Error | unknown) {
-      console.error("API Error:", err);
-      const message = err instanceof Error ? err.message : "Something went wrong!";
-      console.log("Error in Single history", message);
-    } finally {
-      setLoading(false);
-    }
-  }
+  //         setChat(formattedChat);
+  //       }
+  //     }
+  //   } catch (err: Error | unknown) {
+  //     console.error("API Error:", err);
+  //     const message = err instanceof Error ? err.message : "Something went wrong!";
+  //     console.log("Error in Single history", message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
   async function getAllHistory() {
-    setLoading(true);
+    setHistoryLoading(true);
     try {
       const response = await HistoryAPI.getAllhistory(1);
       console.log("API Response:", response);
       if (response.statusText) {
         setConversationData(response.data);
-        setLoading(false);
+        setHistoryLoading(false);
       }
-    } catch (err:any) {
-      if(err.response){
+    } catch (err: any) {
+      setHistoryLoading(false);
+      if (err.response) {
         toast.error(err.response.data.detail);
-      }else{
+      } else {
         toast.error(err.message);
       }
       console.error("API Error:", err);
@@ -109,12 +104,15 @@ const ChatHistory: React.FC = () => {
   }
 
   useEffect(() => {
+    setComparisonView(false);
     getAllHistory();
   }, [])
 
   const handleSelectHistory = (userId: number, conversationId: number) => {
-    singleHistory(userId, conversationId);
-    setSelectedConversationId(conversationId);
+    console.log("conversationId chathistory handleselecet", userId, conversationId);
+    nav("/optimization", {
+      state: { userId: userId, conversationId: conversationId}
+    })
   };
 
 
@@ -279,7 +277,7 @@ const ChatHistory: React.FC = () => {
   }, [])
 
 
- 
+
 
   // --------------------------
   // Handle User Send Message
@@ -301,43 +299,54 @@ const ChatHistory: React.FC = () => {
     callChatTextAPIPipeline(userMessage);
   };
 
-  console.log("chathistory", chat, "firstChatText", firstChatText)
-  console.log("conversationData chathostoryPage", conversationData);
-  console.log("loading chathistory", loading);
-
   return (
-    <div className="flex bg-white pt-4 text-black md:flex-row flex-col h-[calc(100vh-80px)] md:overflow-hidden overflow-y-auto">
-      {/* Sidebar */}
+    <div className="relative flex bg-white pt-4 text-black md:flex-row flex-col h-[calc(100vh-80px)] md:overflow-hidden overflow-y-auto">
 
-      <div className="ml-5 border border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden ">
+      {/* <div className="absolute inset-0 bg-gradient-to-r from-purple-100 via-transparent to-[#fce7d4] z-0"></div> */}
+
+      {/* Dotted Texture */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(currentColor 2px, transparent 1px)`,
+          backgroundSize: "25px 25px",
+          color: "rgba(0,0,0,0.08)",
+        }}
+      ></div>
+
+      {/* Sidebar */}
+      <div className="ml-5 border-2 border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden ">
         {/* Header */}
-        <div className="p-4 border-b border-gray-300 flex-shrink-0">
-          <div className="flex items-center gap-2 text-black-400 text-sm">
-            <History className="w-4 h-4" />
+        <div className="p-4 border-b-2 border-gray-300 flex-shrink-0">
+          <div className="flex items-center gap-2 text-black-400 text-sm ">
+            <History className="w-4 h-4 " />
             {/* <span>History (5 Recent Chats)</span> */}
-            <span>History</span>
+            <span className='font-semibold text-[18px]'>History</span>
           </div>
         </div>
 
         {/* Chat History List */}
         {/* Scrollable Conversation History */}
         <div className="overflow-y-auto h-[calc(100%-56px)]">
-          {conversationData?.conversations && conversationData.conversations.length > 0 ? (
-            conversationData.conversations.map((c) => (
-              <div
-                key={c.conversation_id}
-                className={`p-4 hover:bg-gray-300 rounded-lg cursor-pointer  ${selectedConversationId === c.conversation_id ? "bg-gray-400" : ""}`}
-                // onClick={() => { singleHistory(1, c.conversation_id); setSelectedHistory(true); setSelectedConversationId(c.conversation_id) }}
-                onClick={() => {handleSelectHistory(1, c.conversation_id);setTitle(c.last_user_query) }}
-              >
-                <h3 className="text-black text-sm font-medium mb-1">
-                  {c.last_user_query}
-                </h3>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-400 text-sm text-center py-4">No Data Found</p>
+          {historyLoading ? <Loader /> : (
+            conversationData?.conversations && conversationData.conversations.length > 0 ? (
+              conversationData.conversations.map((c) => (
+                <div
+                  key={c.conversation_id}
+                  className={`p-4 hover:bg-gray-300  rounded-lg cursor-pointer`}
+                  // onClick={() => { singleHistory(1, c.conversation_id); setSelectedHistory(true); setSelectedConversationId(c.conversation_id) }}
+                  onClick={() => { handleSelectHistory(1, c.conversation_id); setTitle(c.last_user_query) }}
+                >
+                  <h3 className="text-black  text-sm font-medium  mb-1">
+                    {c.last_user_query}
+                  </h3>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-400 text-sm text-center py-4">No Data Found</p>
+            )
           )}
+
         </div>
 
       </div>
@@ -346,8 +355,8 @@ const ChatHistory: React.FC = () => {
       {/* Main Content */}
       <div className="mr-5 ml-10 flex-1 rounded-lg flex flex-col h-full md:overflow-hidden ">
         {/* Header */}
-        <div className="border-b p-3 border-gray-300 flex-shrink-0">
-          <h1 className="text-xl font-medium">{title ? title : "Chat History"}</h1>
+        <div className="border-b-2 p-3 border-gray-400 flex-shrink-0">
+          <h1 className="text-xl font-semibold">{title ? title : "Chat History"}</h1>
         </div>
 
         <div className="flex-1 p-6 overflow-y-auto flex flex-col-reverse">
@@ -364,7 +373,7 @@ const ChatHistory: React.FC = () => {
                   {item.loading ? (
                     <div className="flex items-center gap-2 text-gray-500 italic">
                       {/* Spinner */}
-                      <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
                       Loading...
                     </div>
                   ) : (
@@ -385,7 +394,7 @@ const ChatHistory: React.FC = () => {
 
 
         {/* Bottom Animation + Steps (Fixed inside content) */}
-        {processSteps && queryID ? (
+        {checkProcessStep && queryID ? (
           <div className="p-6 flex-shrink-0 ">
             <div className="flex gap-6 items-center justify-center">
               {/* Left side - Animation */}
@@ -448,8 +457,8 @@ const ChatHistory: React.FC = () => {
         ) : ""}
 
         {/* Input Area (Fixed bottom) */}
-        <div className={`p-6 flex-shrink-0 ${loading && "cursor-not-allowed"}`}>
-          <div className="bg-[#D9D9D9] h-32 rounded-lg p-3 flex flex-col">
+        <div className={`p-6 flex-shrink-0 ${loading && "cursor-not-allowed"}  `}>
+          <div className="bg-[#D9D9D9] h-32 rounded-3xl p-3 flex flex-col border-2 border-gray-300">
             <textarea
               placeholder="Write anything..."
               value={inputValue}

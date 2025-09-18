@@ -11,6 +11,9 @@ import VisibilityNoDataFound from "./mainhistorycomponent/VisibilityNoDataFound"
 import MentionBarNoDataFound from "./mainhistorycomponent/MentionBarNoDataFound";
 import VisibilityChart2 from "./mainhistorycomponent/VisibilityChart2";
 import { productMatrices } from "@/api/optimizationApi";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import Loader from "@/component/loader/Loader";
 
 
 interface ChatItem {
@@ -35,17 +38,26 @@ const MainHistory: React.FC = () => {
   })
   const [productVisible, setProductVisible] = useState(false);
   const [chat, setChat] = useState<ChatItem[]>([]);
+  const [singleConversationId, setSingleConversationId] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+ const  [noData, setNoData] = useState<boolean>(false);
 
-  const { comparisonView, queryID, setProductMatricesData, conversationData, setConversationData } = useAuth();
-  console.log("queryID mainhistory", queryID);
-  console.log("visibilityData", visibilityData, "openVisibility", openVisibility);
+  const nav = useNavigate();
+  const location = useLocation();
 
-  async function singleHistory(userId: number, conversationID: number) {
+  const { userId, conversationId } = location.state || {};
+
+  const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData } = useAuth();
+
+
+  async function singleHistory(userId: number, conversationId: number) {
     try {
-
-      const response = await HistoryAPI.getSinglehistory(userId, conversationID);
+      setLoading(true);
+      const response = await HistoryAPI.getSinglehistory(userId, conversationId);
       console.log("API Response:", response);
       if (response.statusText) {
+        setLoading(false);
+        setSingleConversationId(conversationId);
         if (response?.data.conversation && Array.isArray(response.data.conversation)) {
 
           // ✅ Remove last 3
@@ -59,32 +71,49 @@ const MainHistory: React.FC = () => {
           }));
 
           setChat(formattedChat);
+          setQueryID(response.data.final_query_id);
         }
       }
-    } catch (err: Error | unknown) {
-      console.error("API Error:", err);
-      const message = err instanceof Error ? err.message : "Something went wrong!";
-      console.log("Error in Single history", message);
+    } catch (err: any) {
+      setLoading(false);
+      if (err.response) {
+        toast.error(err.response.data.detail);
+      } else {
+        toast.error(err.message);
+      }
+
     }
   }
 
   async function getAllHistory() {
+    setLoading(true);
     try {
       const response = await HistoryAPI.getAllhistory(1);
       console.log("API Response:", response);
       if (response.statusText) {
+        setLoading(false);
         setConversationData(response.data);
-        singleHistory(1, response.data.conversations[0]?.conversation_id);
+        if (!userId && !conversationId) {
+          singleHistory(1, response.data.conversations[0]?.conversation_id);
+        }
       }
-    } catch (err: Error | unknown) {
-      console.error("API Error:", err);
-      const message = err instanceof Error ? err.message : "Something went wrong!";
-      console.log("Error", message);
+    } catch (err: any) {
+      setLoading(false);
+      if (err.response) {
+        toast.error(err.response.data.detail);
+      } else {
+        toast.error(err.message);
+      }
     }
   }
 
   useEffect(() => {
-    getAllHistory();
+    if (userId && conversationId) {
+      singleHistory(userId, conversationId);
+      getAllHistory();
+    } else {
+      getAllHistory();
+    }
   }, [])
 
   async function productMetrices(queryID: number, productName: string) {
@@ -98,10 +127,13 @@ const MainHistory: React.FC = () => {
 
       }
 
-    } catch (err: unknown) {
-      console.error("API Error:", err);
-      const message = err instanceof Error ? err.message : "Something went wrong!";
-      console.log("message mainhistory error", message);
+    } catch (err: any) {
+
+      if (err.response) {
+        toast.error(err.response.data.detail);
+      } else {
+        toast.error(err.message)
+      }
     }
   }
 
@@ -109,25 +141,35 @@ const MainHistory: React.FC = () => {
     if (!queryID) return;
 
     const fetchPipeline = async () => {
+      setLoading(true);
       try {
         const response = await OptimizationAPI.rankedQuery(queryID);
         console.log("API Response:", response);
 
         if (response.statusText) {
+          setLoading(false);
           setOptimizationRank(response.data);
+          if(response.data.rankings.length === 0){
+            setNoData(true);
+          }
           if (response.data.product_visible) {
             setProductVisible(true);
           }
         }
-      } catch (err: unknown) {
-        console.error("API Error:", err);
-        const message = err instanceof Error ? err.message : "Something went wrong!";
-        console.log("message mainhistory error", message);
+      } catch (err: any) {
+        setLoading(false);
+        if (err.response) {
+          toast.error(err.response.data.detail);
+        } else {
+          toast.error(err.message);
+        }
       }
     };
 
     fetchPipeline();
   }, [queryID])
+
+  console.log("userId conversationId", userId, conversationId);
 
   return (
     <>
@@ -144,48 +186,33 @@ const MainHistory: React.FC = () => {
                   {/* Header */}
                   <div className="relative flex justify-between items-center border-b border-gray-200 pb-3 mb-4">
                     <h2 className="text-sm font-semibold text-gray-700">Your Query</h2>
-                    <button className="text-xs text-purple-400 hover:text-purple-500">
+                    <button className="text-md text-purple-400 hover:text-purple-700 cursor-pointer"
+                      onClick={() => { nav("/chathistory") }}
+                    >
                       Start New
                     </button>
                   </div>
 
                   {/* Chat messages */}
-                  {/* <div className="space-y-4">
-                   
-                    <div className="flex justify-end">
-                      <div className="bg-gray-100 px-4 py-2 rounded-lg text-sm">
-                        Best Nike Shoes
-                      </div>
-                    </div>
-                    <div className="flex justify-start">
-                      <div className="bg-[#7C3BED] px-4 py-3 rounded-lg text-sm text-white leading-relaxed max-w-[80%]">
-                        <p>Do you want to search any specific shoes?</p>
-                        <p className="mt-2 font-semibold">Shoes type:</p>
-                        <p>Running, Sports, Casuals, etc</p>
-                        <p className="mt-2 font-semibold">Price Range:</p>
-                        <p>1000-2000, 2000-5000, etc</p>
-                      </div>
-                    </div>
-                  </div> */}
-
-
-                  {/* Chat messages */}
-                  <div className="space-y-4 h-64 overflow-y-auto pr-2">
-                    {chat.map((msg, index) => (
-                      <div
-                        key={index}
-                        className={`flex ${msg.id === "user" ? "justify-end" : "justify-start"}`}
-                      >
+                  <div className="relative space-y-4 h-64 overflow-y-auto pr-2">
+                    {loading ? <Loader /> : (
+                      chat.map((msg, index) => (
                         <div
-                          className={`px-4 py-3 rounded-lg text-sm max-w-[80%] leading-relaxed ${msg.id === "user"
+                          key={index}
+                          className={`flex ${msg.id === "user" ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`px-4 py-3 rounded-lg text-sm max-w-[80%] leading-relaxed ${msg.id === "user"
                               ? "bg-gray-100 text-black" // user message style
                               : "bg-[#7C3BED] text-white" // assistant message style
-                            }`}
-                        >
-                          {msg.title}
+                              }`}
+                          >
+                            {msg.title}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
+
                   </div>
 
                   <div className="flex flex-row gap-3 mt-5">
@@ -206,20 +233,26 @@ const MainHistory: React.FC = () => {
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-6 border-b border-gray-200">
                     <h2 className="text-sm font-semibold text-black">
-                      History <span className="text-black text-[12px] font-normal">(5 Recent Chats)</span>
+                      History
+                      {/* <span className="text-black text-[12px] font-normal">(5 Recent Chats)</span> */}
                     </h2>
                   </div>
 
                   {/* Chats list scrollable */}
-                  <div className="divide-y divide-gray-200 flex-1 overflow-y-auto">
-                    {(conversationData?.conversations && conversationData.conversations.length > 0) && conversationData.conversations.map((c, index) => (
-                      <div
-                        key={index}
-                        className={`px-4 py-3 ${index === 0 && "bg-gray-600 text-white"} hover:bg-gray-600 hover:text-white rounded-lg cursor-pointer transition`}
-                      >
-                        <p className="text-sm font-medium">{c.last_user_query}</p>
-                      </div>
-                    ))}
+                  <div className=" relative divide-y divide-gray-200 flex-1 overflow-y-auto">
+                    {loading ? <Loader /> : (
+                      (conversationData?.conversations && conversationData.conversations.length > 0) && conversationData.conversations.map((c, index) => (
+                        <div
+                          key={index}
+                          className={`px-4 py-3 ${conversationId ? (c.conversation_id === conversationId ? "bg-gray-600 text-white" : "")
+                            : (singleConversationId === c.conversation_id) ? "bg-gray-600 text-white" : ""} hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
+                          onClick={() => { singleHistory(1, c.conversation_id) }}
+                        >
+                          <p className="text-sm font-medium">{c.last_user_query}</p>
+                        </div>
+                      ))
+                    )}
+
                   </div>
 
                   {/* Footer stays at bottom */}
@@ -250,7 +283,7 @@ const MainHistory: React.FC = () => {
 
             {/* Right Column (Rankings) */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col w-full lg:w-[40%] xl:w-[50%] ">
-              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} />
+              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} loading={loading} noData={noData}/>
             </div>
           </div>
         </div>
