@@ -38,7 +38,7 @@ const ChatHistory: React.FC = () => {
   const [historyLoading, setHistoryLoading] = useState<boolean>(false);
  const nav = useNavigate();
 
-  const { firstChatText, setFirstChatText, queryID, setQueryID, conversationData, setConversationData, setComparisonView } = useAuth();
+  const { firstChatText, setFirstChatText, queryID, setQueryID, conversationData, setConversationData, setComparisonView, setIsComparison, setIsVisible } = useAuth();
 
  
   console.log("error", error);
@@ -105,6 +105,8 @@ const ChatHistory: React.FC = () => {
 
   useEffect(() => {
     setComparisonView(false);
+    setIsComparison(false);
+    setIsVisible(false);
     getAllHistory();
   }, [])
 

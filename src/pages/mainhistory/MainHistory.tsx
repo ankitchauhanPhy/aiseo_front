@@ -14,6 +14,7 @@ import { productMatrices } from "@/api/optimizationApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "@/component/loader/Loader";
+import RankingPopup from "@/component/rankingPopUp/RankingPopup";
 
 
 interface ChatItem {
@@ -293,6 +294,8 @@ const MainHistory: React.FC = () => {
       {openVisibility && (
         <ExampleVisibilityDetails openVisibility={openVisibility} setOpenVisibility={setOpenVisibility} visibilityData={visibilityData} />
       )}
+
+      
 
     </>
   );

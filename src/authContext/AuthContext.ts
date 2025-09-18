@@ -59,6 +59,10 @@ export interface AuthContextType {
   setCompetitorProductVisible: React.Dispatch<React.SetStateAction<boolean>>;
   freeTrialPopup: boolean;
   setFreeTrialPopup: React.Dispatch<React.SetStateAction<boolean>>;
+  isVisible: boolean;
+  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  isComparison: boolean;
+  setIsComparison: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Just the context (no component here)

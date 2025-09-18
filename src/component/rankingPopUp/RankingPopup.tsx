@@ -144,7 +144,7 @@ const RankingPopup: React.FC<RankingTableProps> = ({ openComparison, setOpenComp
   console.log("Your Product:", yourProduct);
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col ">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col z-10">
         {/* Shared Scroll Container */}
         <div className="overflow-x-auto flex-1 flex flex-col">
           <div className="min-w-[600px]  flex flex-col h-[100%] ">
