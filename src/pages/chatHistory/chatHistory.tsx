@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { History, ChevronRight, Loader2 } from 'lucide-react';
+import Joyride, { Step } from 'react-joyride';
 
 import ChatHistoryLoading from "../../assets/chatHistory/ChatHistoryLoading.gif"
 import { useAuth } from '@/authContext/useAuth';
@@ -9,13 +10,12 @@ import { ChatTextAPI, HistoryAPI } from '@/api';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ChatMessage from '@/component/ChatMessage';
 
-
 interface ChatItem {
   id: string;
   title: string;
   loading: boolean;
 }
-interface Step {
+interface StepProcess {
   id: number;
   text: string;
   badge?: string;
@@ -36,6 +36,27 @@ const ChatHistory: React.FC = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
 
+  // Joyride states
+  const [run, setRun] = useState(true);
+  
+  const steps: Step[] = [
+    {
+      target: ".nav-bar",
+      content: "Use the navigation bar to move between Home, Dashboard, and Settings.",
+    },
+    {
+      target: ".history-sidebar",
+      content: "Here you'll find your previous searches and suggestions.",
+    },
+    {
+      target: ".chat-area",
+      content: "This is where AI shows you product rankings and insights.",
+    },
+    {
+      target: ".input-box",
+      content: "Type your question or product search here and press Enter.",
+    },
+  ];
 
   const { firstChatText, queryID, setQueryID, conversationData, setConversationData } = useAuth();
 
@@ -46,7 +67,7 @@ const ChatHistory: React.FC = () => {
   console.log("userId52", userId, "conversationId", conversationId);
 
   console.log("error", error);
-  const [processSteps, setProcessSteps] = useState<Step[]>([
+  const [processSteps, setProcessSteps] = useState<StepProcess[]>([
     { id: 1, text: 'Creating Queries', badge: 'Query 1', completed: false, active: true },
     { id: 2, text: 'Analysing based on queries', badge: 'Processing', completed: false, active: false },
     { id: 3, text: 'Getting Products Info', badge: 'Gathering Information', completed: false, active: false },
@@ -55,11 +76,8 @@ const ChatHistory: React.FC = () => {
     { id: 6, text: 'Done', completed: false, active: false },
   ]);
 
-
-
   async function singleHistory(userId: number, conversationID: number) {
     try {
-
       const response = await HistoryAPI.getSinglehistory(userId, conversationID);
       console.log("API Response:", response);
       if (response.statusText) {
@@ -109,7 +127,6 @@ const ChatHistory: React.FC = () => {
     singleHistory(userId, conversationId);
     setSelectedConversationId(conversationId);
   };
-
 
   // Polling for query status when process step starts
   useEffect(() => {
@@ -185,13 +202,10 @@ const ChatHistory: React.FC = () => {
     return () => clearInterval(interval);
   }, [queryID]);
 
-
-
   async function callChatTextAPI(userMessage: string) {
     setLoading(true);
     setError("");
     try {
-
       const response = await ChatTextAPI.sendCheckQuery(userMessage);
       console.log("API Response:", response);
       if (response.statusText) {
@@ -226,7 +240,6 @@ const ChatHistory: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-
       const response = await ChatTextAPI.sendPipelineQuery(userMessage);
       console.log("API Response:", response);
       if (response.statusText) {
@@ -243,7 +256,6 @@ const ChatHistory: React.FC = () => {
         // Push AI response
         if (response.data.message) {
           //setChat(prev => [...prev, { id: "assistant", title: response.data.message }]);
-
         }
       }
     } catch (err: Error | unknown) {
@@ -301,9 +313,29 @@ const ChatHistory: React.FC = () => {
 
   return (
     <div className="flex bg-white pt-4 text-black md:flex-row flex-col h-[calc(100vh-80px)] md:overflow-hidden overflow-y-auto">
-      {/* Sidebar */}
+      {/* Joyride Component */}
+      <Joyride
+        steps={steps}
+        run={run}
+        continuous
+        showProgress
+        showSkipButton
+        styles={{
+          options: {
+            primaryColor: "#6C5CE7", // matches your purple header
+            zIndex: 10000,
+          },
+        }}
+        callback={(data) => {
+          const { status } = data;
+          if (status === 'finished' || status === 'skipped') {
+            setRun(false);
+          }
+        }}
+      />
 
-      <div className="ml-5 border border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden ">
+      {/* Sidebar */}
+      <div className="history-sidebar ml-5 border border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden ">
         {/* Header */}
         <div className="p-4 border-b border-gray-300 flex-shrink-0">
           <div className="flex items-center gap-2 text-black-400 text-sm">
@@ -333,12 +365,10 @@ const ChatHistory: React.FC = () => {
             <p className="text-gray-400 text-sm text-center py-4">No Data Found</p>
           )}
         </div>
-
       </div>
 
-
       {/* Main Content */}
-      <div className="mr-5 ml-10 flex-1 rounded-lg flex flex-col h-full md:overflow-hidden ">
+      <div className="chat-area mr-5 ml-10 flex-1 rounded-lg flex flex-col h-full md:overflow-hidden ">
         {/* Header */}
         <div className="border-b p-3 border-gray-300 flex-shrink-0">
           <h1 className="text-xl font-medium">{title ? title : "Chat History"}</h1>
@@ -376,14 +406,11 @@ const ChatHistory: React.FC = () => {
           </div>
         </div>
 
-
-
         {/* Bottom Animation + Steps (Fixed inside content) */}
         {processSteps && queryID ? (
           <div className="p-6 flex-shrink-0 ">
             <div className="flex gap-6 items-center justify-center">
               {/* Left side - Animation */}
-
               <div className="flex items-center justify-center">
                 <img
                   src={ChatHistoryLoading} // place your gif inside public/ folder
@@ -442,7 +469,7 @@ const ChatHistory: React.FC = () => {
         ) : ""}
 
         {/* Input Area (Fixed bottom) */}
-        <div className={`p-6 flex-shrink-0 ${loading && "cursor-not-allowed"}`}>
+        <div className={`input-box p-6 flex-shrink-0 ${loading && "cursor-not-allowed"}`}>
           <div className="bg-[#D9D9D9] h-32 rounded-lg p-3 flex flex-col">
             <textarea
               placeholder="Write anything..."
@@ -464,7 +491,6 @@ const ChatHistory: React.FC = () => {
             </div>
           </div>
         </div>
-
       </div >
     </div >
   );
