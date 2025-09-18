@@ -3,12 +3,13 @@ import Layout from "./layout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import MainHistory from "./pages/mainhistory/MainHistory";
 import ChatHistory from "./pages/chatHistory/chatHistory";
-
 import ProtectedRoute from "./component/ProtectedRoute";
 import HeroSection from "./pages/dashboard/dashboardcomponent/Hero";
 
 import {ToastContainer}  from "react-toastify";
-import TermPopup from "./pages/popup/TermPopup";
+import Loader from "./pages/test/Loader";
+
+
 
 
 function App() {
@@ -32,7 +33,7 @@ function App() {
       {/* Wrap all pages that need Navbar in Layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Dashboard />} />
-        <Route path="/termpopup" element={<TermPopup/>}/>
+        <Route path="/loader" element={<Loader/>} />
         <Route path="/index" element={
           <ProtectedRoute>
             <HeroSection />

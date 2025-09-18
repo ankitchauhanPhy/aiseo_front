@@ -9,7 +9,7 @@ import { useAuth } from "@/authContext/useAuth";
 
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-toastify";
-import Popup from "@/pages/popup/popup";
+import TermPopup from "@/component/termPopUp/TermPopup";
 
 
 const SignUpPopup = () => {
@@ -318,7 +318,7 @@ const SignUpPopup = () => {
 
       {showPopup && (
         <div className="fixed inset-0 z-50">
-          <Popup onClose={() => { setShowPopup(false) }} />
+          <TermPopup onClose={() => { setShowPopup(false) }} />
         </div>
       )}
 
