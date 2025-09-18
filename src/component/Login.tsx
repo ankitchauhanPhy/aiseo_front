@@ -1,20 +1,25 @@
-import { FaGoogle, FaFacebook } from "react-icons/fa";
+import { useState } from "react";
+
 import { RxCrossCircled } from "react-icons/rx";
+import { Eye, EyeOff } from "lucide-react";
 
 import LoginRocket from "../assets/login/LoginRocket.png";
 import LoginRocketBg from "../assets/login/LoginRocketBg2.jpg";
 import type { LoginForm } from "@/type/login/loginType";
 import { useNavigate } from "react-router-dom";
 import { AuthAPI } from "@/api";
-import { useState } from "react";
 import { useAuth } from "@/authContext/useAuth";
+
+import {toast}  from "react-toastify";
 
 const LoginPopup = () => {
   // const LoginPopup: React.FC<LoginProps> = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const nav = useNavigate();
 
   //get Context Value
-  const { setShowSignup, setShowLoginup, setLoginType, firstChatText} = useAuth();
+  const { setShowSignup, setShowLoginup, setFreeTrialPopup } = useAuth();
 
   const [formData, setFormData] = useState<LoginForm>({
     email: "",
@@ -37,8 +42,54 @@ const LoginPopup = () => {
     }));
   };
 
+  // ✅ Validation logic
+const validateForm = () => {
+  if (!formData.email.trim()) {
+    toast.error("Email is required");
+    return false;
+  }
+
+  // Basic format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    toast.error("Please enter a valid email address");
+    return false;
+  }
+
+  // ✅ Allowed domains
+  const allowedDomains = [
+    "gmail.com",
+    "yahoo.com",
+    "outlook.com",
+    "hotmail.com",
+    "protonmail.com"
+  ];
+
+  const domain = formData.email.split("@")[1];
+  if (!allowedDomains.includes(domain)) {
+    toast.error(`Email domain '${domain}' is not supported`);
+    return false;
+  }
+
+  if (!formData.password.trim()) {
+    toast.error("Password is required");
+    return false;
+  }
+  if (formData.password.length < 6) {
+    toast.error("Password must be at least 6 characters");
+    return false;
+  }
+
+  return true;
+};
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Run validation first
+    if (!validateForm()) return;
+
     // Perform signup logic here
     try {
       const data = await AuthAPI.login(formData);
@@ -48,24 +99,19 @@ const LoginPopup = () => {
         localStorage.setItem("company_name", data.user.company_name);
         localStorage.setItem("use_iD", data.user.id);
         localStorage.setItem("Name", data.user.username);
-
-        alert("Login Successfull!")
+        toast.success("Log in Sucess!");
+       
         setShowLoginup(false);
-        setLoginType(true);
-        if(!firstChatText){
-        nav('/');
-        } else if(firstChatText){
-          nav("/chathistory");
-        }
+        setFreeTrialPopup(true);
       } else {
         console.log("Login not success");
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Signup error:", error.message);
-        alert(`Login failed: ${error.message}`);
+    } catch (error:any) {
+      if (error.response) {
+        console.error("login Error", error);
+        toast.error(`${error.response.data.detail}`);
       } else {
-        console.error("Unknown error:", error);
+        toast.error("Unknown Error:", error.message);
       }
     }
   };
@@ -97,7 +143,7 @@ const LoginPopup = () => {
           </div>
           <img src={LoginRocket} alt="Rocket" className="w-40 h-40 mb-6" />
           <h2 className="text-4xl font-bold leading-snug text-left">
-           Log in and continue your <br/>AI SEO journey.
+            Log in and continue your <br />AI SEO journey.
           </h2>
         </div>
 
@@ -122,15 +168,22 @@ const LoginPopup = () => {
                 />
               </div>
 
-              <div>
+              <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
 
               <div className="flex justify-end">
@@ -149,11 +202,6 @@ const LoginPopup = () => {
                 Login
               </button>
 
-              {/* Separator text */}
-              {/* <p className="my-3 text-center text-[#BFBFBF] text-[16px]">
-                Didn’t have an account?
-              </p> */}
-
               <button
                 type="button"
                 className="w-full border border-gray-400 py-2 rounded-md font-semibold text-[14px] bg-white  hover:bg-purple-700 text-black hover:text-white transition"
@@ -162,21 +210,6 @@ const LoginPopup = () => {
                 Create an Account
               </button>
             </form>
-
-            {/* Divider */}
-            <div className="flex items-center justify-center my-6">
-              <span className="px-3 text-[#1A1A1A] text-[14px]">Login using</span>
-            </div>
-
-            {/* Social Login */}
-            <div className="flex justify-center gap-6 mb-5">
-              <button className="w-12 h-12 bg-[#CAC7FF] border border-gray-600 flex items-center justify-center rounded-lg hover:bg-gray-800">
-                <FaGoogle className="text-red-500" size={22} />
-              </button>
-              <button className="w-12 h-12 bg-[#CAC7FF] border border-gray-600 flex items-center justify-center rounded-lg hover:bg-gray-800">
-                <FaFacebook className="text-blue-500" size={22} />
-              </button>
-            </div>
           </div>
         </div>
       </div>

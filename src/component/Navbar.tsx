@@ -23,6 +23,7 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
   function removeLoginToken() {
     localStorage.removeItem("login");
     setLoginType(false);
+    setOpen(false);
     nav("/");
   }
 
