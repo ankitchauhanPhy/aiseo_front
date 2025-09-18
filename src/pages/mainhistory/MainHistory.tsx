@@ -48,7 +48,7 @@ const MainHistory: React.FC = () => {
 
   const { userId, conversationId } = location.state || {};
 
-  const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData } = useAuth();
+  const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData, setIsVisible, setIsComparison } = useAuth();
 
 
   async function singleHistory(userId: number, conversationId: number) {
@@ -125,7 +125,6 @@ const MainHistory: React.FC = () => {
       if (response.statusText) {
         setProductVisible(true);
         setProductMatricesData(response.data);
-
       }
 
     } catch (err: any) {
@@ -247,7 +246,7 @@ const MainHistory: React.FC = () => {
                           key={index}
                           className={`px-4 py-3 ${conversationId ? (c.conversation_id === conversationId ? "bg-gray-600 text-white" : "")
                             : (singleConversationId === c.conversation_id) ? "bg-gray-600 text-white" : ""} hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
-                          onClick={() => { singleHistory(1, c.conversation_id) }}
+                          onClick={() => { singleHistory(1, c.conversation_id); setIsVisible(false); setIsComparison(false) }}
                         >
                           <p className="text-sm font-medium">{c.last_user_query}</p>
                         </div>
@@ -284,7 +283,9 @@ const MainHistory: React.FC = () => {
 
             {/* Right Column (Rankings) */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col w-full lg:w-[40%] xl:w-[50%] ">
-              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} loading={loading} noData={noData}/>
+              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} 
+              loading={loading} noData={noData} 
+              />
             </div>
           </div>
         </div>

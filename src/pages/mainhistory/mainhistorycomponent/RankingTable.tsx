@@ -118,29 +118,45 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
   )
 }
 
-const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productVisible, productMatrices, setProductVisible, loading, noData }) => {
+const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productVisible, productMatrices, setProductVisible, loading, noData, }) => {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [openDemo, setOpenDemo] = useState(false);
   const [rankingPopup, setRankingPopup] = useState<boolean>(false);
   const [yourProduct, setYourProduct] = useState<any>(null);
 
-   const { setComparisonView,
+  const { setComparisonView,
     queryID,
     yourProductName, setYourProductName,
     setCompetitorProductName,
     isVisible, setIsVisible,
-    isComparison, setIsComparison
+    isComparison, setIsComparison,
+    setProductMatricesData,
   } = useAuth();
 
 
   const dummyName: string = "Reebok Performer";
+  
 
-  useEffect(()=>{
-    if(isVisible && yourProductName){
-      productMatrices(queryID,yourProductName)
+  useEffect(() => {
+    if (isVisible && yourProductName) {
+      productMatrices(queryID, yourProductName)
       setYourProduct(yourProductName);
+    } else if (!isVisible) {
+      setIsComparison(false);
+      setYourProduct(null);
+      setYourProductName("");
+      setProductVisible(false);
+      setProductMatricesData([]);
+      setCompetitors(prev =>
+        prev.map((c,) => ({
+          ...c,
+          isYou: false
+        }))
+      );
     }
-  },[isVisible])
+    }, [isVisible])
+
+  console.log("data", isVisible, isComparison, "yourProduct", yourProduct,"yourProductName", yourProductName, "productVisible", productVisible);
 
   useEffect(() => {
     if (optimizationRank?.rankings) {
@@ -235,7 +251,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                              ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-blue-300"} 
                               cursor-pointer rounded-xl`}
                     onClick={() => {
-                      if (!productVisible && isVisible) {
+                      if (!productVisible && isVisible && !isComparison) {
                         setYourProduct(competitor.name)
                         setYourProductName(competitor.name)
                         setCompetitors(prev =>
@@ -246,16 +262,26 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                         )
                         productMatrices(queryID, competitor.name)
 
-                      } else if (!productVisible && !isVisible) {
+                      } 
+                      else if (!productVisible && !isVisible && !isComparison) {
                         toast.info("Firstly check the Visibility");
                       }
-                      else if (productVisible && !isComparison) {
-                        toast.info("Firstly Check The Comparison!");
+                      else if (productVisible && !isComparison && !isVisible) {
+                        toast.info("Firstly check the visibility");
                       }
-                      else if (productVisible && isComparison) {
+                      else if(productVisible && isVisible && !isComparison){
+                        setYourProduct(competitor.name)
+                        setYourProductName(competitor.name)
+                        setCompetitors(prev =>
+                          prev.map((c, i) => ({
+                            ...c,
+                            isYou: i === index // only clicked competitor is true
+                          }))
+                        )
+                        productMatrices(queryID, competitor.name)
+                      }
+                      else if (productVisible && isComparison && isVisible) {
                         setComparisonView(true)
-                        setOpenDemo(true)
-                        setProductVisible(false)
                         setCompetitorProductName?.(competitor.name)
                       }
                     }}

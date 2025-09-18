@@ -10,7 +10,7 @@ import MentionsChatgpt1 from "../../../assets/mainHistory/MentionChatgpt1.svg";
 import MentionsGemini from "../../../assets/mainHistory/MentionsGemini.svg";
 import { useAuth } from "@/authContext/useAuth";
 
-const platformData = [
+const initialPlatforms = [
   {
     name: "Perplexity",
     // icon: (
@@ -21,7 +21,7 @@ const platformData = [
     icon: `${MentionsPerplexity}`,
     mentions: 0,
     color: "bg-blue-500",
-    
+
   },
   {
     name: "Open AI",
@@ -33,7 +33,7 @@ const platformData = [
     icon: `${MentionsChatgpt1}`,
     mentions: 0,
     color: "bg-purple-500",
-   
+
   },
   {
     name: "Gemini",
@@ -45,28 +45,34 @@ const platformData = [
     icon: `${MentionsGemini}`,
     mentions: 0,
     color: "bg-orange-500",
-     },
+  },
 ]
 
 export default function MentionBar() {
 
   const { productMatricesData } = useAuth();
-
+  console.log("productMatricesData mentionBar", productMatricesData);
+  const [platformData, setPlatformData] = useState(initialPlatforms);
   const [isAnimated, setIsAnimated] = useState(false)
   const totalMentions = productMatricesData[0].total_mentions ?? 0;
 
   useEffect(() => {
     if (productMatricesData.length > 0) {
-      platformData.map((item) => {
-        const temp = item.name.toLowerCase().replace(" ", ""); 
-        console.log("temp", temp);
+      const updated = initialPlatforms.map((item) => {
+        const key = item.name.toLowerCase().replace(" ", "");
+        console.log("temp", key);
         // dynamic key lookup
-        item.mentions = productMatricesData[0].mentions_by_platform[temp]
-          ? productMatricesData[0].mentions_by_platform[temp]
-          : 0 ;
+        // item.mentions = productMatricesData[0].mentions_by_platform[temp]
+        //   ? productMatricesData[0].mentions_by_platform[temp]
+        //   : 0 ;
 
-        return item;
+        // return item;
+        return {
+          ...item,
+          mentions: productMatricesData[0].mentions_by_platform?.[key] ?? 0,
+        };
       });
+      setPlatformData(updated);
     }
   }, [productMatricesData]);
 
@@ -75,9 +81,9 @@ export default function MentionBar() {
       setIsAnimated(true)
     }, 100)
     return () => clearTimeout(timer)
-  }, [])
+  }, [productMatricesData])
 
-  
+
 
   return (
     <Card className="p-6 bg-white shadow-sm border border-gray-200 rounded-2xl h-full">
@@ -104,7 +110,10 @@ export default function MentionBar() {
       {/* Platform List */}
       <div className="space-y-5">
         {platformData.map((platform, index) => {
-          const progressPercent = (platform.mentions / totalMentions) * 100;
+          // const progressPercent = (platform.mentions / totalMentions) * 100;
+          const progressPercent = totalMentions
+            ? (platform.mentions / totalMentions) * 100
+            : 0;
           return (
             <div key={index} className="flex items-center gap-4">
               {/* Platform Icon */}

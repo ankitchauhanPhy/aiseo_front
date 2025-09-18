@@ -149,7 +149,7 @@ import { useAuth } from "@/authContext/useAuth";
 // Register Chart.js components
 Chart.register(...registerables)
 
-const BarChart: React.FC<VisibilityProps> = ({ setOpenVisibility, setVisibilityData }) => {
+const   BarChart: React.FC<VisibilityProps> = ({ setOpenVisibility, setVisibilityData }) => {
   const chartRef = useRef<HTMLCanvasElement>(null)
   const chartInstance = useRef<Chart | null>(null)
   const labels = ["Perplexity", "OpenAI", "Gemini"]
@@ -175,7 +175,7 @@ const BarChart: React.FC<VisibilityProps> = ({ setOpenVisibility, setVisibilityD
         }
       })
     }
-  }, [])
+  }, [productMatricesData])
 
   useEffect(() => {
     if (!chartRef.current) return
@@ -306,7 +306,7 @@ const BarChart: React.FC<VisibilityProps> = ({ setOpenVisibility, setVisibilityD
         chartInstance.current.destroy()
       }
     }
-  }, [setOpenVisibility, setVisibilityData])
+  }, [setOpenVisibility, setVisibilityData, productMatricesData])
 
   return (
     <div className="relative h-64 pt-10">
