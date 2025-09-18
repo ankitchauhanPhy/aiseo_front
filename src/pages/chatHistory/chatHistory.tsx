@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { History, ChevronRight, Loader2 } from 'lucide-react';
-import Joyride, { Step } from 'react-joyride';
+import { Step } from 'react-joyride';
 
 import ChatHistoryLoading from "../../assets/chatHistory/ChatHistoryLoading.gif"
 import { useAuth } from '@/authContext/useAuth';
@@ -9,6 +9,7 @@ import { ChatTextAPI, HistoryAPI } from '@/api';
 // import ChatMessage from '@/component/ChatMessage';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ChatMessage from '@/component/ChatMessage';
+import { useOnboarding } from '@/context/OnboardingProvider';
 
 interface ChatItem {
   id: string;
@@ -28,17 +29,11 @@ interface ApiConversation {
 }
 
 const ChatHistory: React.FC = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [checkProcessStep, setCheckProcessStep] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [chat, setChat] = useState<ChatItem[]>([]);
-  const [selectedConversationId, setSelectedConversationId] = useState<number>(0);
-  const [title, setTitle] = useState<string>("");
 
   // Joyride states
+  const { startTour } = useOnboarding();
   const [run, setRun] = useState(true);
-  
+
   const steps: Step[] = [
     {
       target: ".nav-bar",
@@ -57,6 +52,14 @@ const ChatHistory: React.FC = () => {
       content: "Type your question or product search here and press Enter.",
     },
   ];
+
+  const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [checkProcessStep, setCheckProcessStep] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [chat, setChat] = useState<ChatItem[]>([]);
+  const [selectedConversationId, setSelectedConversationId] = useState<number>(0);
+  const [title, setTitle] = useState<string>("");
 
   const { firstChatText, queryID, setQueryID, conversationData, setConversationData } = useAuth();
 
@@ -122,6 +125,14 @@ const ChatHistory: React.FC = () => {
   useEffect(() => {
     getAllHistory();
   }, [])
+
+  useEffect(() => {
+    if (!localStorage.getItem("chatHistoryTourDone")) {
+      startTour(steps);
+      localStorage.setItem("chatHistoryTourDone", "true");
+    }
+  }, []);
+
 
   const handleSelectHistory = (userId: number, conversationId: number) => {
     singleHistory(userId, conversationId);
@@ -313,26 +324,6 @@ const ChatHistory: React.FC = () => {
 
   return (
     <div className="flex bg-white pt-4 text-black md:flex-row flex-col h-[calc(100vh-80px)] md:overflow-hidden overflow-y-auto">
-      {/* Joyride Component */}
-      <Joyride
-        steps={steps}
-        run={run}
-        continuous
-        showProgress
-        showSkipButton
-        styles={{
-          options: {
-            primaryColor: "#6C5CE7", // matches your purple header
-            zIndex: 10000,
-          },
-        }}
-        callback={(data) => {
-          const { status } = data;
-          if (status === 'finished' || status === 'skipped') {
-            setRun(false);
-          }
-        }}
-      />
 
       {/* Sidebar */}
       <div className="history-sidebar ml-5 border border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden ">
@@ -354,7 +345,7 @@ const ChatHistory: React.FC = () => {
                 key={c.conversation_id}
                 className={`p-4 hover:bg-gray-300 rounded-lg cursor-pointer  ${selectedConversationId === c.conversation_id ? "bg-gray-400" : ""}`}
                 // onClick={() => { singleHistory(1, c.conversation_id); setSelectedHistory(true); setSelectedConversationId(c.conversation_id) }}
-                onClick={() => {handleSelectHistory(1, c.conversation_id);setTitle(c.last_user_query) }}
+                onClick={() => { handleSelectHistory(1, c.conversation_id); setTitle(c.last_user_query) }}
               >
                 <h3 className="text-black text-sm font-medium mb-1">
                   {c.last_user_query}
