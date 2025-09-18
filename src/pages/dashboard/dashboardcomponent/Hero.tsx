@@ -1,7 +1,5 @@
 import { ChevronRight, CircleX } from "lucide-react";
 import { useEffect, useState } from "react";
-import MainLogo from "../../../assets/dashboard/MainLogoDashboard.svg";
-// import MainLogo from "../../../assets/dashboard/icons-logo.gif";
 
 import SignUpPopup from "@/component/SignUp";
 import LoginPopup from "@/component/Login";
@@ -9,7 +7,10 @@ import LoginPopup from "@/component/Login";
 import { useAuth } from "@/authContext/useAuth";
 import { useNavigate } from "react-router-dom";
 import { HistoryAPI } from "@/api";
-import { WelcomePopup } from "@/component/WelcomePopup";
+import { WelcomePopup } from "@/component/freeTrialPopUp/WelcomePopup";
+import MainLogo from "../../../assets/dashboard/MainLogoDashboard.svg";
+import { toast } from "react-toastify";
+import Loader from "@/component/loader/Loader";
 
 
 export default function HeroSection() {
@@ -36,13 +37,20 @@ export default function HeroSection() {
   const nav = useNavigate();
 
   async function getAllHistory() {
+    setLoading(true);
     try {
       const response = await HistoryAPI.getAllhistory(1);
       console.log("API Response:", response);
       if (response.statusText) {
         setConversationData(response.data);
+        setLoading(false);
       }
-    } catch (err: Error | unknown) {
+    } catch (err: any) {
+      if (err.response) {
+        toast.error(err.response.data.detail);
+      } else {
+        toast.error(err.message);
+      }
       console.error("API Error:", err);
       const message = err instanceof Error ? err.message : "Something went wrong!";
       console.log("Error", message);
@@ -54,10 +62,10 @@ export default function HeroSection() {
     if (loginStatus === "true") {
       setLoginType(true);
       setFreeTrialPopup(false);
-      //nav("/index")
     } else {
       setLoginType(false);
     }
+
     setLoginDashboard(loginStatus === "true");
   }, [loginType, setLoginType]);
 
@@ -70,10 +78,8 @@ export default function HeroSection() {
   }
 
   const handleSend = async () => {
-    setLoading(true);
     if (!inputValue.trim()) {
-      alert("Please write something before sending!");
-      setLoading(false);
+      toast.warning("Please write something before sending!");
       return;
     }
 
@@ -84,27 +90,19 @@ export default function HeroSection() {
       setFirstChatText(inputValue);
       setShowLoginup(true);
     }
-
     setInputValue("");
-    setLoading(false);
+
   };
-
-
-
 
   const handleGoToDashboard = () => {
     console.log('Redirecting to dashboard...');
     setLoginType(true);
     if (!firstChatText) {
-      nav('/index');
+      nav('/chathistory');
     } else if (firstChatText) {
       nav("/chathistory");
     }
   };
-
-  // const handleClose = () => {
-  //   setFreeTrialPopup(false);
-  // };
 
   return (
     <>
@@ -148,24 +146,26 @@ export default function HeroSection() {
               </div>
               {/* Scrollable Content */}
               <div className="p-4 space-y-3 overflow-y-auto h-[calc(100%-56px)]">
-                {conversationData?.conversations && conversationData?.conversations.length > 0 ? (
-                  <>
-                    {conversationData.conversations.map((c) => (
-                      <div
-                        key={c.conversation_id}
-                        className="p-3 bg-gray-100 rounded-md hover:bg-gray-300 cursor-pointer"
-                        onClick={() => {
-                          nav("/optimization", {
-                            state: { userId: 1, conversationId: c.conversation_id }
-                          })
-                        }}
-                      >
-                        {c.last_user_query}
-                      </div>
-                    ))}
-                  </>
-                ) : (
-                  "No Data Found"
+                {loading ? (<Loader />) : (
+                   conversationData?.conversations && conversationData?.conversations.length > 0 ? (
+                    <>
+                      {conversationData.conversations.map((c) => (
+                        <div
+                          key={c.conversation_id}
+                          className="p-3 bg-gray-100 rounded-md hover:bg-gray-300 cursor-pointer"
+                          onClick={() => {
+                            nav("/optimization", {
+                              state: { userId: 1, conversationId: c.conversation_id }
+                            })
+                          }}
+                        >
+                          {c.last_user_query}
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    "No Data Found"
+                  )
                 )}
               </div>
             </div>
@@ -203,21 +203,6 @@ export default function HeroSection() {
                   your brand presence across ChatGPT, Perplexity, Google Gemini, and
                   more.
                 </p>
-
-                {/* Buttons */}
-                {/* {(!loginDashboard && !loginType) && (
-                  <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button
-                      className="px-6 py-3 bg-[#311267] text-white rounded-xl shadow-lg hover:bg-purple-700 transition"
-                      onClick={handleChatOpen}
-                    >
-                      Start Free Trial → No Credit Card Required
-                    </button>
-                    <button className="px-6 py-3 border border-[#311267] text-[#311267] hover:text-white rounded-xl shadow-lg hover:bg-[#311267] transition">
-                      See How It Works
-                    </button>
-                  </div>
-                )} */}
               </div>
             </div>
           </div>
@@ -336,7 +321,7 @@ export default function HeroSection() {
         </div>
       )}
 
-     
+
     </>
   );
 }

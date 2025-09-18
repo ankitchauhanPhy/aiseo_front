@@ -7,7 +7,7 @@ import ProtectedRoute from "./component/ProtectedRoute";
 import HeroSection from "./pages/dashboard/dashboardcomponent/Hero";
 
 import {ToastContainer}  from "react-toastify";
-import Loader from "./pages/test/Loader";
+
 
 
 
@@ -33,7 +33,6 @@ function App() {
       {/* Wrap all pages that need Navbar in Layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Dashboard />} />
-        <Route path="/loader" element={<Loader/>} />
         <Route path="/index" element={
           <ProtectedRoute>
             <HeroSection />

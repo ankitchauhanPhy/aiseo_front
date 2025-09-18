@@ -9,6 +9,8 @@ import { ChatTextAPI, HistoryAPI } from '@/api';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ChatMessage from '@/component/ChatMessage';
 
+import {toast} from "react-toastify";
+
 
 interface ChatItem {
   id: string;
@@ -55,8 +57,6 @@ const ChatHistory: React.FC = () => {
     { id: 6, text: 'Done', completed: false, active: false },
   ]);
 
-
-
   async function singleHistory(userId: number, conversationID: number) {
     try {
 
@@ -88,13 +88,20 @@ const ChatHistory: React.FC = () => {
   }
 
   async function getAllHistory() {
+    setLoading(true);
     try {
       const response = await HistoryAPI.getAllhistory(1);
       console.log("API Response:", response);
       if (response.statusText) {
         setConversationData(response.data);
+        setLoading(false);
       }
-    } catch (err: Error | unknown) {
+    } catch (err:any) {
+      if(err.response){
+        toast.error(err.response.data.detail);
+      }else{
+        toast.error(err.message);
+      }
       console.error("API Error:", err);
       const message = err instanceof Error ? err.message : "Something went wrong!";
       console.log("Error", message);
@@ -191,7 +198,6 @@ const ChatHistory: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-
       const response = await ChatTextAPI.sendCheckQuery(userMessage);
       console.log("API Response:", response);
       if (response.statusText) {
@@ -202,6 +208,7 @@ const ChatHistory: React.FC = () => {
         }
         // Push AI response
         if (response.data.message) {
+
           // setChat(prev => [...prev, { id: "assistant", title: response.data.message }]);
           setChat(prev => prev.map(item =>
             item.id === "assistant" && item.loading
@@ -226,7 +233,6 @@ const ChatHistory: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-
       const response = await ChatTextAPI.sendPipelineQuery(userMessage);
       console.log("API Response:", response);
       if (response.statusText) {
@@ -239,11 +245,6 @@ const ChatHistory: React.FC = () => {
               ? { id: "assiatant", title: response.data.message, loading: false } // replace placeholder
               : item
           ));
-        }
-        // Push AI response
-        if (response.data.message) {
-          //setChat(prev => [...prev, { id: "assistant", title: response.data.message }]);
-
         }
       }
     } catch (err: Error | unknown) {
@@ -260,12 +261,11 @@ const ChatHistory: React.FC = () => {
   // --------------------------
   // On First Render → add user input and call API
   // --------------------------
-
-
   useEffect(() => {
     if (firstChatText && chat.length === 0) {
       // Push initial user chat
       setChat(prev => [...prev, { id: "user", title: firstChatText, loading: false }]);
+
       // Push AI placeholder
       setChat(prev => [...prev, { id: "assistant", title: "", loading: true }]);
       callChatTextAPI(firstChatText);
@@ -289,16 +289,15 @@ const ChatHistory: React.FC = () => {
       alert("Write Something!");
       return;
     }
-
-    // setCheckInputArea(true);
     const userMessage = inputValue.trim();
 
     // Push user message
     setChat(prev => [...prev, { id: "user", title: userMessage, loading: false }]);
     setInputValue("");
+
     // Push AI placeholder
     setChat(prev => [...prev, { id: "assistant", title: "", loading: true }]);
-    //callChatTextAPI(userMessage);
+
     callChatTextAPIPipeline(userMessage);
   };
 

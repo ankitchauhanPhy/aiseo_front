@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import myLogo from "../assets/Logo.png";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from 'lucide-react';
@@ -14,11 +14,21 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [fullname, setFullname] = useState("");
 
   const nav = useNavigate();
 
   // get context values
-  const { setShowLoginup, setLoginType, comparisonView, setComparisonView } = useAuth();
+  const { setShowLoginup, loginType, setLoginType, comparisonView, setComparisonView } = useAuth();
+
+  useEffect(()=>{
+    if(loginType){
+   const  fullName =  localStorage.getItem("Name");
+   if(fullName){
+    setFullname(fullName);
+   }
+    }
+  },[loginType])
 
   function removeLoginToken() {
     localStorage.removeItem("login");
@@ -139,7 +149,7 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
               <div className="hidden lg:block relative">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => setOpen(!open)}>
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-sm font-medium text-white">
-                    AV
+                    {fullname ? fullname[0] : ""}
                   </div>
                   <svg
                     className={`w-4 h-4 text-white transition-transform ${open ? "rotate-180" : "rotate-0"

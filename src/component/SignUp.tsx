@@ -10,6 +10,7 @@ import { useAuth } from "@/authContext/useAuth";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-toastify";
 import TermPopup from "@/component/termPopUp/TermPopup";
+import Loader from "./loader/Loader";
 
 
 const SignUpPopup = () => {
@@ -17,6 +18,7 @@ const SignUpPopup = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -125,18 +127,21 @@ const SignUpPopup = () => {
     // Run validation first
     if (!validateForm()) return;
 
+    setLoading(true);
     // Perform signup logic here
     console.log(formData, "formData");
     try {
       // formData.username = formData.firstName + formData.familyName;
       const data = await AuthAPI.signup(formData);
       console.log("Signup Success", data);
-      if (data.create) {
+      if (data.id) {
         toast.success("Accound Created!");
         setShowSignup(false);
         setShowLoginup(true);
+        
       }
     } catch (error: any) {
+      setLoading(false);
       if (error.response) {
         toast.error(error.response.data.detail);
       } else {
@@ -319,6 +324,12 @@ const SignUpPopup = () => {
       {showPopup && (
         <div className="fixed inset-0 z-50">
           <TermPopup onClose={() => { setShowPopup(false) }} />
+        </div>
+      )}
+
+      {loading && (
+        <div className="fixed inset-0 z-50">
+          <Loader/>
         </div>
       )}
 

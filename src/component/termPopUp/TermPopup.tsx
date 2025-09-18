@@ -6,7 +6,7 @@ interface PopupProps {
   onClose: () => void;
 }
 
-export default function Popup({ onClose }: PopupProps) {
+export default function TermPopup({ onClose }: PopupProps) {
   const [activeTab, setActiveTab] = useState<"terms" | "privacy">("terms");
 
   return (

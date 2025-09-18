@@ -11,10 +11,12 @@ import { AuthAPI } from "@/api";
 import { useAuth } from "@/authContext/useAuth";
 
 import {toast}  from "react-toastify";
+import Loader from "./loader/Loader";
 
 const LoginPopup = () => {
-  // const LoginPopup: React.FC<LoginProps> = () => {
+  
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const nav = useNavigate();
 
@@ -89,7 +91,7 @@ const validateForm = () => {
 
     // Run validation first
     if (!validateForm()) return;
-
+    setLoading(true);
     // Perform signup logic here
     try {
       const data = await AuthAPI.login(formData);
@@ -98,15 +100,14 @@ const validateForm = () => {
         localStorage.setItem("login", "true");
         localStorage.setItem("company_name", data.user.company_name);
         localStorage.setItem("use_iD", data.user.id);
-        localStorage.setItem("Name", data.user.username);
+        localStorage.setItem("Name", `${data.user.first_name} ${data.user.last_name}`);
         toast.success("Log in Sucess!");
-       
+        setLoading(false);
         setShowLoginup(false);
         setFreeTrialPopup(true);
-      } else {
-        console.log("Login not success");
       }
     } catch (error:any) {
+      setLoading(false);
       if (error.response) {
         console.error("login Error", error);
         toast.error(`${error.response.data.detail}`);
@@ -213,6 +214,11 @@ const validateForm = () => {
           </div>
         </div>
       </div>
+      {loading && (
+        <div className="fixed inset-0 z-50">
+          <Loader/>
+        </div>
+      )}
     </div>
   );
 }
