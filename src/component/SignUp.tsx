@@ -1,25 +1,35 @@
 import { useState } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 import { RiArrowLeftSLine } from "react-icons/ri";
-import SignupRocketBg from "../assets/login/LoginRocketBg2.jpg"; // you can use the same bg
-import SignupRocket from "../assets/login/LoginRocket.png"; // rocket image
+import SignupRocketBg from "../assets/login/LoginRocketBg2.jpg";
+import SignupRocket from "../assets/login/LoginRocket.png";
 import { AuthAPI } from "@/api";
 import type { SignUpForm } from "@/type/signup/signupType";
 import { useAuth } from "@/authContext/useAuth";
 
+import { Eye, EyeOff } from "lucide-react";
+import { toast } from "react-toastify";
+import TermPopup from "@/component/termPopUp/TermPopup";
+import Loader from "./loader/Loader";
+
 
 const SignUpPopup = () => {
-  //const SignUpPopup: React.FC<SignUpProps> = () => {
 
   const [isOpen, setIsOpen] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  //get Context Value
+  const [showPopup, setShowPopup] = useState(false);
+
+  // Context Provider Value
   const { setShowSignup, setShowLoginup } = useAuth();
 
+  //SignUp Form Data
   const [formData, setFormData] = useState<SignUpForm>({
     first_name: "",
     last_name: "",
-    username:"",
+    username: "",
     company_name: "",
     job_role: "",
     email: "",
@@ -35,6 +45,10 @@ const SignUpPopup = () => {
     setShowSignup(false);
   }
 
+  const openTermPage = () => {
+    setShowPopup(true);
+  }
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -45,26 +59,93 @@ const SignUpPopup = () => {
     }));
   };
 
+
+  //Signup Validation
+  const validateForm = () => {
+    if (!formData.first_name.trim()) {
+      toast.error("First name is required");
+      return false;
+    }
+
+    if (!formData.last_name.trim()) {
+      toast.error("Last name is required");
+      return false;
+    }
+
+    if (!formData.email.trim()) {
+      toast.error("Email is required");
+      return false;
+    }
+
+    // Email regex check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    // ✅ Domain check (extend list as needed)
+    const allowedDomains = [
+      "gmail.com",
+      "yahoo.com",
+      "outlook.com",
+      "hotmail.com",
+      "protonmail.com"
+    ];
+    const domain = formData.email.split("@")[1];
+    if (!allowedDomains.includes(domain)) {
+      toast.error(`Email domain '${domain}' is not supported`);
+      return false;
+    }
+
+    if (!formData.password.trim()) {
+      toast.error("Password is required");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return false;
+    }
+
+    if (!formData.agreeTC) {
+      toast.error("You must agree to Terms & Conditions");
+      return false;
+    }
+
+    return true;
+  };
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Run validation first
+    if (!validateForm()) return;
+
+    setLoading(true);
     // Perform signup logic here
-    console.log(formData,"formData");
+    console.log(formData, "formData");
     try {
       // formData.username = formData.firstName + formData.familyName;
       const data = await AuthAPI.signup(formData);
       console.log("Signup Success", data);
-      if (data.create) {
-        alert("Account created!");
+      if (data.id) {
+        toast.success("Accound Created!");
         setShowSignup(false);
         setShowLoginup(true);
-      } else {
-        console.log("Data for Signupo not Create");
+        
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Signup error:", error.message);
+    } catch (error: any) {
+      setLoading(false);
+      if (error.response) {
+        toast.error(error.response.data.detail);
       } else {
-        console.error("Unknown error:", error);
+        toast.error("Unknown Error : ", error.message);
       }
     }
   };
@@ -76,7 +157,7 @@ const SignUpPopup = () => {
       {/* Overlay with blur */}
       <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
 
-      <div className="relative flex lg:w-[780px] font-sans rounded-lg shadow-xl bg-[#140b26] transition-shadow duration-300 hover:shadow-[0_0_40px_rgba(124,59,237,0.6)]">
+      <div className="relative flex lg:w-[800px] font-sans rounded-lg shadow-xl bg-[#140b26] transition-shadow duration-300 hover:shadow-[0_0_40px_rgba(124,59,237,0.6)]">
         {/* Close button */}
         <RxCrossCircled
           className="absolute  right-[-0%] hover:text-purple-400 text-2xl cursor-pointer z-10"
@@ -93,11 +174,11 @@ const SignUpPopup = () => {
           style={{ backgroundImage: `url(${SignupRocketBg})` }}
         >
           <div className="bg-[#7C3BED] text-white text-xs px-4 py-1 rounded-full mb-6">
-            ✨ The Future of Search
+            ✨ Organic Growth, Reinvented
           </div>
           <img src={SignupRocket} alt="Rocket" className="w-40 h-40 mb-6" />
           <h2 className="text-4xl font-bold leading-snug text-left">
-            The New <br /> Frontier for <br /> Organic Growth
+            Turn AI search into your next growth channel.
           </h2>
         </div>
 
@@ -107,18 +188,18 @@ const SignUpPopup = () => {
             <button
               type="button"
               className="flex items-center gap-1 text-sm text-[#7C3BED] hover:text-purple-400 mb-4"
-              onClick={() => alert("Back to Login")}
+              onClick={() => { setShowSignup(false); setShowLoginup(true); }}
             >
               <RiArrowLeftSLine className="text-lg" />
               Back to Login
             </button>
 
 
-            <h2 className="text-3xl font-bold mb-2 text-center md:whitespace-nowrap">Sign Up</h2>
+            <h2 className="text-xl font-bold mb-2 text-center md:whitespace-nowrap">Start Your <br /> Free Trial Today</h2>
             <p
               className="text-center font-normal text-[16px] leading-[150%] tracking-[-0.03em] font-inter text-black mb-6"
             >
-              Let’s Start the Journey to Growth together!
+              No credit card required. Get instant access in under 2 minutes
             </p>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -172,74 +253,86 @@ const SignUpPopup = () => {
               />
 
               <div className="flex flex-col md:flex-row gap-4">
-                <input
-                  type="password"
-                  placeholder="Password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
-                  required
-                />
+                <div className="relative w-full">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={(() => setShowPassword(!showPassword))}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+
+                <div className="relative w-full">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm Pass"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 bg-transparent border-0 border-b border-gray-300 focus:outline-none focus:border-b-2 focus:border-purple-500"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+
               </div>
 
               <div className="flex flex-col justify-between items-start sm:items-center mt-2 gap-4">
                 {/* Left side (checkboxes stacked) */}
                 <div className="flex flex-col gap-2 text-sm text-black">
-                  <label className="flex items-center gap-2">
+                  <label className="inline-flex items-center">
                     <input
                       type="checkbox"
                       name="agreeTC"
                       checked={formData.agreeTC}
                       onChange={handleChange}
-                      className="accent-purple-500"
+                      className="accent-purple-500 mr-5"
                     />
-                    I’ve read and agreed to{" "}
-                    <span className="text-purple-400 cursor-pointer">T&C</span>
-                  </label>
-
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="subscribe"
-                      checked={formData.subscribe}
-                      onChange={handleChange}
-                      className="accent-purple-500"
-                    />
-                    I want to subscribe to the newsletter
+                    <span>
+                      I agree to the <span className="text-purple-400 cursor-pointer" onClick={()=>{openTermPage();}}>Terms & Conditions </span> and the <span className="text-purple-400 cursor-pointer" onClick={()=>{openTermPage();}}>Privacy Policy</span>
+                    </span>
                   </label>
                 </div>
-
-                {/* Right side (forget password) */}
-                <button
-                  type="button"
-                  className="text-sm text-gray-400 hover:text-purple-400"
-                  onClick={() => alert("Redirect to Forget Password")}
-                >
-                  Forget Password?
-                </button>
               </div>
-
-
               <button
                 type="submit"
                 className="w-full bg-[#7C3BED] hover:bg-purple-700 py-2 rounded-md font-semibold mt-4 transition text-white"
               >
-                Create Account
+                Create Free Account
               </button>
             </form>
           </div>
         </div>
       </div>
+
+      {showPopup && (
+        <div className="fixed inset-0 z-50">
+          <TermPopup onClose={() => { setShowPopup(false) }} />
+        </div>
+      )}
+
+      {loading && (
+        <div className="fixed inset-0 z-50">
+          <Loader/>
+        </div>
+      )}
+
     </div>
   );
 }

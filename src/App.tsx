@@ -3,20 +3,38 @@ import Layout from "./layout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import MainHistory from "./pages/mainhistory/MainHistory";
 import ChatHistory from "./pages/chatHistory/chatHistory";
-
 import ProtectedRoute from "./component/ProtectedRoute";
 import HeroSection from "./pages/dashboard/dashboardcomponent/Hero";
-import Popup from "./pages/popup/popup";
+
+import {ToastContainer}  from "react-toastify";
+import NoDataFound from "./component/noDataFound/NoDataFound";
+
+
+
 
 
 function App() {
 
   return (
+    <>
+     <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored" // can be "light" | "dark" | "colored"
+      />
+
     <Routes>
       {/* Wrap all pages that need Navbar in Layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Dashboard />} />
-        <Route path="/popup" element={<Popup/>}/>
+        <Route path="/no" element={<NoDataFound />} />
         <Route path="/index" element={
           <ProtectedRoute>
             <HeroSection />
@@ -33,6 +51,7 @@ function App() {
           </ProtectedRoute>} />
       </Route>
     </Routes>
+    </>
   );
 }
 

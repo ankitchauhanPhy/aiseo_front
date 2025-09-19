@@ -1,8 +1,8 @@
 import { Trophy, Medal, Award } from "lucide-react"
-import MainHistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryVisibilityLogo3.svg";
-import MainHistoryRankingGemini from "../../../assets/mainHistory/MainHistoryRankingGemini.svg";
-import MainHistoryRankingPerplexity1 from "../../../assets/mainHistory/MainHistoryRankingPerplexity1.svg";
-import MainHistoryRankingPerplexity2 from "../../../assets/mainHistory/MainHistoryRankingPerplexity2.svg";
+import MainHoistoryRankingChatgpt from "../../assets/mainHistory/MainHistoryRankingsChatgpt.svg";
+import MainHistoryRankingGemini from "../../assets/mainHistory/MainHistoryRankingGemini.svg";
+import MainHistoryRankingPerplexity1 from "../../assets/mainHistory/MainHistoryRankingPerplexity1.svg";
+import MainHistoryRankingPerplexity2 from "../../assets/mainHistory/MainHistoryRankingPerplexity2.svg";
 import { useAuth } from "@/authContext/useAuth";
 import { useEffect, useState } from "react";
 import {
@@ -11,11 +11,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
 import Loader from "@/component/loader/Loader";
 import NoDataFound from "@/component/noDataFound/NoDataFound";
-import { toast } from "react-toastify";
-// import RankingPopup from "@/component/rankingPopUp/RankingPopup";
+import {toast} from "react-toastify";
 
 interface Competitor {
   name: string
@@ -58,6 +56,8 @@ interface RankingTableProps {
   setProductVisible: (val: boolean) => void;
   loading: boolean;
   noData: boolean;
+  openComparison: boolean;
+  setOpenComparison: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function getRankingColor(rank: number): string {
@@ -92,7 +92,7 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
 
   switch (type) {
     case "chatgpt":
-      iconSrc = MainHistoryRankingChatgpt
+      iconSrc = MainHoistoryRankingChatgpt
       break
     case "gemini":
       iconSrc = MainHistoryRankingGemini
@@ -108,7 +108,7 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
   }
 
   return (
-    <div className="w-12 h-12 flex items-center justify-center">
+    <div className="w-8 h-8 flex items-center justify-center">
       {iconSrc ? (
         <img src={iconSrc} alt={type} className="w-6 h-6 object-contain" />
       ) : (
@@ -118,45 +118,13 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
   )
 }
 
-const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productVisible, productMatrices, setProductVisible, loading, noData, }) => {
+const RankingPopup: React.FC<RankingTableProps> = ({ openComparison, setOpenComparison, optimizationRank, productVisible, productMatrices, setProductVisible, loading, noData }) => {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const [openDemo, setOpenDemo] = useState(false);
-  const [rankingPopup, setRankingPopup] = useState<boolean>(false);
+  const { setComparisonView, queryID, yourProductName, setYourProductName, setCompetitorProductName } = useAuth();
   const [yourProduct, setYourProduct] = useState<any>(null);
-
-  const { setComparisonView,
-    queryID,
-    yourProductName, setYourProductName,
-    setCompetitorProductName,
-    isVisible, setIsVisible,
-    isComparison, setIsComparison,
-    setProductMatricesData,
-  } = useAuth();
-
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const dummyName: string = "Reebok Performer";
-  
-
-  useEffect(() => {
-    if (isVisible && yourProductName) {
-      productMatrices(queryID, yourProductName)
-      setYourProduct(yourProductName);
-    } else if (!isVisible) {
-      setIsComparison(false);
-      setYourProduct(null);
-      setYourProductName("");
-      setProductVisible(false);
-      setProductMatricesData([]);
-      setCompetitors(prev =>
-        prev.map((c,) => ({
-          ...c,
-          isYou: false
-        }))
-      );
-    }
-    }, [isVisible])
-
-  console.log("data", isVisible, isComparison, "yourProduct", yourProduct,"yourProductName", yourProductName, "productVisible", productVisible);
 
   useEffect(() => {
     if (optimizationRank?.rankings) {
@@ -173,11 +141,10 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
       setCompetitors(formatted);
     }
   }, [optimizationRank]);
-
   console.log("Your Product:", yourProduct);
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col ">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col z-10">
         {/* Shared Scroll Container */}
         <div className="overflow-x-auto flex-1 flex flex-col">
           <div className="min-w-[600px]  flex flex-col h-[100%] ">
@@ -207,16 +174,13 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                     <label className="flex items-center gap-1 text-sm text-gray-700 font-semibold">
                       <input type="checkbox" className="accent-purple-600 mr-2"
                         checked={isVisible}
-                        onChange={(e) => { setIsVisible(e.target.checked); setRankingPopup(true) }}
+                        onChange={(e) => setIsVisible(e.target.checked)}
                       />
                       Visibility
                     </label>
-                    {productVisible &&
+                    {isVisible &&
                       <label className="flex items-center gap-1 text-sm text-gray-700 font-semibold">
-                        <input type="checkbox" className="accent-purple-600 mr-2"
-                          checked={isComparison}
-                          onChange={((e) => { setIsComparison(e.target.checked) })}
-                        />
+                        <input type="checkbox" className="accent-purple-600 mr-2" />
                         Comparison
                       </label>
                     }
@@ -248,10 +212,10 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                   <div
                     key={index}
                     className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] 
-                             ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-blue-300"} 
-                              cursor-pointer rounded-xl`}
+                             ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-purple-200"} 
+                              cursor-pointer`}
                     onClick={() => {
-                      if (!productVisible && isVisible && !isComparison) {
+                      if (!productVisible && isVisible) {
                         setYourProduct(competitor.name)
                         setYourProductName(competitor.name)
                         setCompetitors(prev =>
@@ -262,26 +226,12 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                         )
                         productMatrices(queryID, competitor.name)
 
-                      } 
-                      else if (!productVisible && !isVisible && !isComparison) {
+                      }else if(!productVisible && !isVisible){
                         toast.info("Firstly check the Visibility");
-                      }
-                      else if (productVisible && !isComparison && !isVisible) {
-                        toast.info("Firstly check the visibility");
-                      }
-                      else if(productVisible && isVisible && !isComparison){
-                        setYourProduct(competitor.name)
-                        setYourProductName(competitor.name)
-                        setCompetitors(prev =>
-                          prev.map((c, i) => ({
-                            ...c,
-                            isYou: i === index // only clicked competitor is true
-                          }))
-                        )
-                        productMatrices(queryID, competitor.name)
-                      }
-                      else if (productVisible && isComparison && isVisible) {
+                      } 
+                      else if (productVisible) {
                         setComparisonView(true)
+                        setProductVisible(false)
                         setCompetitorProductName?.(competitor.name)
                       }
                     }}
@@ -355,16 +305,9 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
           </div>
         </div>
       </div>
-      {/* {rankingPopup && 
-        <RankingPopup openComparison={rankingPopup} setOpenComparison={setRankingPopup}
-        optimizationRank={optimizationRank} productVisible={productVisible} 
-        productMatrices={productMatrices} setProductVisible={setProductVisible} 
-        loading={loading} noData={noData}/>
-      } */}
-
     </>
   )
 }
 
-export default RankingsTable;
+export default RankingPopup;
 

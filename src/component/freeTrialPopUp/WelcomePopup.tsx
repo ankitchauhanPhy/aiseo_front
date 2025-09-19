@@ -5,21 +5,14 @@ interface WelcomePopupProps {
   onClose?: () => void;
 }
 
-export const WelcomePopup: React.FC<WelcomePopupProps> = ({ onGoToDashboard, onClose }) => {
+export const WelcomePopup: React.FC<WelcomePopupProps> = ({ onGoToDashboard}) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+
+      {/* Overlay with blur */}
+      <div className="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto relative">
-        {/* Close button */}
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        )}
         
         {/* Content */}
         <div className="p-8">

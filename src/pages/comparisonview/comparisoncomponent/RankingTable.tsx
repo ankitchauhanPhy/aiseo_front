@@ -1,6 +1,6 @@
 import { Trophy, Medal, Award } from "lucide-react"
 
-import MainHoistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryRankingsChatgpt.svg";
+import MainHoistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryVisibilityLogo3.svg";
 import MainHistoryRankingGemini from "../../../assets/mainHistory/MainHistoryRankingGemini.svg";
 import MainHistoryRankingPerplexity1 from "../../../assets/mainHistory/MainHistoryRankingPerplexity1.svg";
 import MainHistoryRankingPerplexity2 from "../../../assets/mainHistory/MainHistoryRankingPerplexity2.svg";
@@ -12,8 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Rankings from "../../../components/ui/popup";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+// import Rankings from "../../../components/ui/popup";
+// import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Competitor {
   name: string;
@@ -109,7 +109,7 @@ function PlatformIcon({
   }
 
   return (
-    <div className="w-8 h-8 flex items-center justify-center">
+    <div className="w-12 h-12 flex items-center justify-center">
       {iconSrc ? (
         <img src={iconSrc} alt={type} className="w-6 h-6 object-contain" />
       ) : (
@@ -126,8 +126,7 @@ const RankingTable: React.FC<RankingTableProps> = ({
   setProductVisible,
 }) => {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const { setComparisonView, queryID, yourProductName, competitorProductName } =
-    useAuth();
+  const { setComparisonView, queryID,setQueryID, setCompetitorProductName, yourProductName, competitorProductName } = useAuth();
   const [openDemo, setOpenDemo] = useState(false);
   const [yourProduct, setYourProduct] = useState<any>(null);
 
@@ -149,6 +148,7 @@ const RankingTable: React.FC<RankingTableProps> = ({
     }
   }, [optimizationRank]);
   console.log("Your Product:", yourProduct);
+  console.log("Competitor", competitors, "optimizationRank", optimizationRank);
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col ">
@@ -200,15 +200,18 @@ const RankingTable: React.FC<RankingTableProps> = ({
               {competitors.map((competitor, index) => (
                 <div
                   key={index}
-                  className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] cursor-pointer
-                    ${
-                      competitor.isYou || yourProductName === competitor.name
+                  className={`relative flex items-center gap-1 md:gap-2 p-4 min-w-[600px] cursor-pointer
+                    ${competitor.isYou || yourProductName === competitor.name
+                      ? "bg-purple-200"
+                      : competitorProductName === competitor.name
                         ? "bg-purple-200"
-                        : competitorProductName === competitor.name
-                        ? "bg-purple-100"
-                        : "hover:bg-purple-200"
+                        : "hover:bg-blue-200"
                     }`}
                   onClick={() => {
+                    if(yourProductName !== competitor.name){
+                      setQueryID(optimizationRank.query_id);
+                      setCompetitorProductName?.(competitor.name);
+                    }
                     if (!productVisible) {
                       setYourProduct(competitor.name);
                       setCompetitors((prev) =>
@@ -225,6 +228,8 @@ const RankingTable: React.FC<RankingTableProps> = ({
                     }
                   }}
                 >
+
+
                   {/* Overall Rank */}
                   <div className="flex items-center justify-center w-[60px] md:w-[80px] lg:w-[80px]">
                     <span className="text-sm font-medium text-gray-600">
@@ -252,21 +257,30 @@ const RankingTable: React.FC<RankingTableProps> = ({
                             {(getTrophyIcon(competitor.overallRank) ||
                               yourProductName === competitor.name ||
                               competitorProductName === competitor.name) && (
-                              <div className="flex items-center flex-shrink-0 ml-1">
-                                {/* Left arrow if your product */}
-                                {yourProductName === competitor.name && (
-                                  <ChevronLeft className="w-4 h-4 text-purple-600" />
-                                )}
+                                <div className="flex items-center flex-shrink-0 ml-1">
+                                  {/* Left arrow if your product */}
+                                  {/* {yourProductName === competitor.name && (
+                                    <ChevronLeft className="w-4 h-4 text-purple-600" />
 
-                                {/* Trophy */}
-                                {getTrophyIcon(competitor.overallRank)}
+                                  )} */}
 
-                                {/* Right arrow if competitor product */}
-                                {competitorProductName === competitor.name && (
-                                  <ChevronRight className="w-4 h-4 text-purple-600" />
-                                )}
-                              </div>
-                            )}
+                                  {/* Trophy */}
+                                  {getTrophyIcon(competitor.overallRank)}
+
+                                  {/* Right arrow if competitor product */}
+                                  {/* {competitorProductName === competitor.name && ( */}
+                                  {/* <ChevronRight className="w-4 h-4 text-purple-600" /> */}
+                                  {/* <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="w-20 h-9 text-blue-500"
+                                      viewBox="0 0 24 24"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                )} */}
+                                </div>
+                              )}
                           </div>
                         </div>
                       </TooltipTrigger>
@@ -312,13 +326,40 @@ const RankingTable: React.FC<RankingTableProps> = ({
                         : "-"}
                     </span>
                   </div>
+                  {/* RIGHT overlay arrow for competitor product */}
+                  {competitorProductName === competitor.name && (
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-10 h-8 text-blue-600"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  )}
+
+                  {/* LEFT overlay arrow for your product */}
+                  {yourProductName === competitor.name && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-10 h-8 text-blue-600"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M16 5v14l-11-7z" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
-      <Rankings open={openDemo} onOpenChange={setOpenDemo} competitor={""} />
+      {/* <Rankings open={openDemo} onOpenChange={setOpenDemo} competitor={""} /> */}
     </>
   );
 };

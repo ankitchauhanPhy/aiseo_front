@@ -6,7 +6,7 @@ import LightBulb from "../../assets/mainHistory/LightBulb.png";
 import { useAuth } from "@/authContext/useAuth";
 import ComparisonView from "../comparisonview/ComparisonView";
 import ExampleVisibilityDetails from "@/component/VisibilityDetails";
-import { OptimizationAPI } from "@/api";
+import { HistoryAPI, OptimizationAPI } from "@/api";
 import VisibilityNoDataFound from "./mainhistorycomponent/VisibilityNoDataFound";
 import MentionBarNoDataFound from "./mainhistorycomponent/MentionBarNoDataFound";
 import VisibilityChart2 from "./mainhistorycomponent/VisibilityChart2";
@@ -14,13 +14,25 @@ import { productMatrices } from "@/api/optimizationApi";
 import { useOnboarding } from "../../context/OnboardingProvider";
 import { Step } from 'react-joyride';
 
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import Loader from "@/component/loader/Loader";
+// import RankingPopup from "@/component/rankingPopUp/RankingPopup";
 
-type ChatItem = {
-  text: string;
-  time: string;
-};
+
+interface ChatItem {
+  id: string;
+  title: string;
+  loading: boolean;
+}
+
+interface ApiConversation {
+  role: "user" | "assistant";
+  message: string;
+}
 
 const MainHistory: React.FC = () => {
+
   const [openVisibility, setOpenVisibility] = useState(false);
   const [visibilityData, setVisibilityData] = useState("");
   const [optimizationRank, setOptimizationRank] = useState({
@@ -29,8 +41,19 @@ const MainHistory: React.FC = () => {
     rankings: []
   })
   const [productVisible, setProductVisible] = useState(false);
-  const { comparisonView, queryID, setProductMatricesData } = useAuth();
+  // const { comparisonView, queryID, setProductMatricesData } = useAuth();
   const { startTour } = useOnboarding();
+  const [chat, setChat] = useState<ChatItem[]>([]);
+  const [singleConversationId, setSingleConversationId] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+ const  [noData, setNoData] = useState<boolean>(false);
+
+  const nav = useNavigate();
+  const location = useLocation();
+
+  const { userId, conversationId } = location.state || {};
+
+  const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData, setIsVisible, setIsComparison } = useAuth();
 
   // Joyride steps configuration
   const tourSteps: Step[] = [
@@ -93,17 +116,71 @@ useEffect(() => {
     return () => clearTimeout(timer); // cleanup
   }
 }, []);
+  async function singleHistory(userId: number, conversationId: number) {
+    try {
+      setLoading(true);
+      const response = await HistoryAPI.getSinglehistory(userId, conversationId);
+      console.log("API Response:", response);
+      if (response.statusText) {
+        setLoading(false);
+        setSingleConversationId(conversationId);
+        if (response?.data.conversation && Array.isArray(response.data.conversation)) {
 
-  console.log("queryID mainhistory", queryID);
-  console.log("visibilityData", visibilityData, "openVisibility", openVisibility);
+          // ✅ Remove last 3
+          const withoutLastThree = response.data.conversation.slice(0, -3);
 
-  const chats: ChatItem[] = [
-    { text: "Best Nike Shoes under 5000", time: "yesterday" },
-    { text: "Running shoes Under 5000", time: "2 days ago" },
-    { text: "Casual Running Shoes", time: "3 days ago" },
-    { text: "High Ankle Casual Shoes under 10,000", time: "06/08/2025" },
-    { text: "Bestselling Nike Shoes in India", time: "02/09/2025" },
-  ];
+          // Transform API conversation → ChatItem[]
+          const formattedChat: ChatItem[] = withoutLastThree.map((c: ApiConversation) => ({
+            id: c.role,            // "user" | "assistant"
+            title: c.message,      // message text
+            loading: false         // always false here
+          }));
+
+          setChat(formattedChat);
+          setQueryID(response.data.final_query_id);
+        }
+      }
+    } catch (err: any) {
+      setLoading(false);
+      if (err.response) {
+        toast.error(err.response.data.detail);
+      } else {
+        toast.error(err.message);
+      }
+
+    }
+  }
+
+  async function getAllHistory() {
+    setLoading(true);
+    try {
+      const response = await HistoryAPI.getAllhistory(1);
+      console.log("API Response:", response);
+      if (response.statusText) {
+        setLoading(false);
+        setConversationData(response.data);
+        if (!userId && !conversationId) {
+          singleHistory(1, response.data.conversations[0]?.conversation_id);
+        }
+      }
+    } catch (err: any) {
+      setLoading(false);
+      if (err.response) {
+        toast.error(err.response.data.detail);
+      } else {
+        toast.error(err.message);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (userId && conversationId) {
+      singleHistory(userId, conversationId);
+      getAllHistory();
+    } else {
+      getAllHistory();
+    }
+  }, [])
 
   async function productMetrices(queryID: number, productName: string) {
     try {
@@ -114,10 +191,14 @@ useEffect(() => {
         setProductVisible(true);
         setProductMatricesData(response.data);
       }
-    } catch (err: unknown) {
-      console.error("API Error:", err);
-      const message = err instanceof Error ? err.message : "Something went wrong!";
-      console.log("message mainhistory error", message);
+
+    } catch (err: any) {
+
+      if (err.response) {
+        toast.error(err.response.data.detail);
+      } else {
+        toast.error(err.message)
+      }
     }
   }
 
@@ -125,25 +206,35 @@ useEffect(() => {
     if (!queryID) return;
 
     const fetchPipeline = async () => {
+      setLoading(true);
       try {
         const response = await OptimizationAPI.rankedQuery(queryID);
         console.log("API Response:", response);
 
         if (response.statusText) {
+          setLoading(false);
           setOptimizationRank(response.data);
+          if(response.data.rankings.length === 0){
+            setNoData(true);
+          }
           if (response.data.product_visible) {
             setProductVisible(true);
           }
         }
-      } catch (err: unknown) {
-        console.error("API Error:", err);
-        const message = err instanceof Error ? err.message : "Something went wrong!";
-        console.log("message mainhistory error", message);
+      } catch (err: any) {
+        setLoading(false);
+        if (err.response) {
+          toast.error(err.response.data.detail);
+        } else {
+          toast.error(err.message);
+        }
       }
     };
 
     fetchPipeline();
   }, [queryID])
+
+  console.log("userId conversationId", userId, conversationId);
 
   return (
     <>
@@ -160,29 +251,35 @@ useEffect(() => {
                   {/* Header */}
                   <div className="relative flex justify-between items-center border-b border-gray-200 pb-3 mb-4">
                     <h2 className="text-sm font-semibold text-gray-700">Your Query</h2>
-                    <button className="text-xs text-purple-400 hover:text-purple-500">
+                    <button className="text-md text-purple-400 hover:text-purple-700 cursor-pointer"
+                      onClick={() => { nav("/chathistory") }}
+                    >
                       Start New
                     </button>
                   </div>
 
                   {/* Chat messages */}
-                  <div className="space-y-4">
-                    {/* Example messages */}
-                    <div className="flex justify-end">
-                      <div className="bg-gray-100 px-4 py-2 rounded-lg text-sm">
-                        Best Nike Shoes
-                      </div>
-                    </div>
-                    <div className="flex justify-start">
-                      <div className="bg-[#7C3BED] px-4 py-3 rounded-lg text-sm text-white leading-relaxed max-w-[80%]">
-                        <p>Do you want to search any specific shoes?</p>
-                        <p className="mt-2 font-semibold">Shoes type:</p>
-                        <p>Running, Sports, Casuals, etc</p>
-                        <p className="mt-2 font-semibold">Price Range:</p>
-                        <p>1000-2000, 2000-5000, etc</p>
-                      </div>
-                    </div>
+                  <div className="relative space-y-4 h-64 overflow-y-auto pr-2">
+                    {loading ? <Loader /> : (
+                      chat.map((msg, index) => (
+                        <div
+                          key={index}
+                          className={`flex ${msg.id === "user" ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`px-4 py-3 rounded-lg text-sm max-w-[80%] leading-relaxed ${msg.id === "user"
+                              ? "bg-gray-100 text-black" // user message style
+                              : "bg-[#7C3BED] text-white" // assistant message style
+                              }`}
+                          >
+                            {msg.title}
+                          </div>
+                        </div>
+                      ))
+                    )}
+
                   </div>
+
                   <div className="flex flex-row gap-3 mt-5">
                     <img
                       src={LightBulb}
@@ -200,25 +297,30 @@ useEffect(() => {
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-6 border-b border-gray-200">
                     <h2 className="text-sm font-semibold text-black">
-                      History <span className="text-black text-[12px] font-normal">(5 Recent Chats)</span>
+                      History
+                      {/* <span className="text-black text-[12px] font-normal">(5 Recent Chats)</span> */}
                     </h2>
                   </div>
 
                   {/* Chats list scrollable */}
-                  <div className="divide-y divide-gray-200 flex-1 overflow-y-auto">
-                    {chats.map((chat, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition"
-                      >
-                        <p className="text-sm font-medium">{chat.text}</p>
-                        <span className="text-xs text-gray-500">{chat.time}</span>
-                      </div>
-                    ))}
+                  <div className=" relative divide-y divide-gray-200 flex-1 overflow-y-auto">
+                    {loading ? <Loader /> : (
+                      (conversationData?.conversations && conversationData.conversations.length > 0) && conversationData.conversations.map((c, index) => (
+                        <div
+                          key={index}
+                          className={`px-4 py-3 ${conversationId ? (c.conversation_id === conversationId ? "bg-gray-600 text-white" : "")
+                            : (singleConversationId === c.conversation_id) ? "bg-gray-600 text-white" : ""} hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
+                          onClick={() => { singleHistory(1, c.conversation_id); setIsVisible(false); setIsComparison(false) }}
+                        >
+                          <p className="text-sm font-medium">{c.last_user_query}</p>
+                        </div>
+                      ))
+                    )}
+
                   </div>
 
                   {/* Footer stays at bottom */}
-                  <button className="w-full py-3 text-center text-sm font-medium text-gray-300 bg-gray-100 hover:bg-gray-200 rounded-b-2xl transition">
+                  <button className="w-full py-3 text-center text-sm font-medium text-white bg-gray-800 hover:bg-[#7C3BED] rounded-b-2xl transition">
                     View More
                   </button>
                 </div>
@@ -247,24 +349,15 @@ useEffect(() => {
             </div>
 
             {/* Right Column (Rankings) */}
-            <div className="rankings-section bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col w-full lg:w-[40%] xl:w-[50%]">
-              <RankingsTable
-                optimizationRank={optimizationRank}
-                productVisible={productVisible}
-                productMatrices={productMetrices}
-                setProductVisible={setProductVisible}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col w-full lg:w-[40%] xl:w-[50%] ">
+              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} 
+              loading={loading} noData={noData} 
               />
             </div>
           </div>
         </div>
       ) : (
-        <ComparisonView
-          optimizationRank={optimizationRank}
-          productVisible={productVisible}
-          productMatrices={productMatrices}
-          setProductVisible={setProductVisible}
-          setOpenVisibility={setOpenVisibility}
-          setVisibilityData={setVisibilityData}
+        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMatrices} setProductVisible={setProductVisible} 
         />
       )}
       {openVisibility && (
@@ -274,6 +367,9 @@ useEffect(() => {
           visibilityData={visibilityData}
         />
       )}
+
+      
+
     </>
   );
 };

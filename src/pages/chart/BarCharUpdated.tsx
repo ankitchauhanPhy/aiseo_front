@@ -560,9 +560,9 @@ const BarChartUpdated: React.FC<VisibilityProps> = ({ setOpenVisibility, setVisi
     <div className="relative h-64 pt-10">
       <canvas ref={chartRef} />
       {/* Debug info - remove in production */}
-      <div className="absolute top-0 right-0 text-xs text-gray-500 bg-gray-100 p-1 rounded">
+      {/* <div className="absolute top-0 right-0 text-xs text-gray-500 bg-gray-100 p-1 rounded">
         Data: [{chartData.join(', ')}]
-      </div>
+      </div> */}
     </div>
   );
 };
