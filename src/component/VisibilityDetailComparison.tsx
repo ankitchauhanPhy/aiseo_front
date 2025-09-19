@@ -75,7 +75,7 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
         {/* Header */}
         <div className="mb-4">
           <h1 className="text-xl font-bold text-gray-900 mb-1">
-            Visibility Details
+            Competitor Visibility Details
           </h1>
           <div className="flex items-center text-green-600 text-sm">
             <div className="w-2 h-2 bg-green-600 rounded-full mr-2" />
@@ -159,35 +159,33 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
 };
 
 /* Example parent that opens the modal */
-const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
+const ExampleVisibilityDetailsComparison: React.FC<Examplevisibility> = ({
   openVisibility,
   setOpenVisibility,
   visibilityData,
 }) => {
   const {
-    productMatricesData,
     competitorProductVisible,
     productMatricesCompetitor,
-    setProductMatricesCompetitor
   } = useAuth();
 
-  console.log("productMetricesData in visibility", productMatricesData);
   console.log("productMetricesData Competitor", productMatricesCompetitor);
+
   let mockIcon;
   let count;
   if (visibilityData === "Perplexity") {
     mockIcon = MainHistoryVisibilityLogo1;
-    count = productMatricesData[0]?.mentions_by_platform?.perplexity;
+    count = productMatricesCompetitor[0]?.mentions_by_platform?.perplexity;
   } else if (visibilityData === "OpenAI") {
     mockIcon = MainHistoryVisibilityLogo2;
-    count = productMatricesData[0]?.mentions_by_platform?.openai;
+    count = productMatricesCompetitor[0]?.mentions_by_platform?.openai;
   } else if (visibilityData === "Gemini") {
     mockIcon = MainHistoryVisibilityLogo4;
-    count = productMatricesData[0]?.mentions_by_platform?.gemini;
+    count = productMatricesCompetitor[0]?.mentions_by_platform?.gemini;
   }
 
   const platformKey = visibilityData.toLowerCase();
-  const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
+  const citationUrls = productMatricesCompetitor[0]?.citations?.[platformKey] ?? [];
 console.log("202=======",productMatricesCompetitor,competitorProductVisible)
   // const citationUrls =
   //   (competitorProductVisible
@@ -202,8 +200,8 @@ console.log("202=======",productMatricesCompetitor,competitorProductVisible)
     citationsFound: citationUrls.length,
     citationUrls,
     categoriesFound:
-         productMatricesData[0]?.categories?.length ,
-    categories: productMatricesData[0]?.categories ?? [],
+         productMatricesCompetitor[0]?.categories?.length ,
+    categories: productMatricesCompetitor[0]?.categories ?? [],
     monthlyChange: "+30% this month",
   };
 
@@ -219,4 +217,4 @@ console.log("202=======",productMatricesCompetitor,competitorProductVisible)
   );
 };
 
-export default ExampleVisibilityDetails;
+export default ExampleVisibilityDetailsComparison;

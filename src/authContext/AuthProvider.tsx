@@ -18,6 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [freeTrialPopup, setFreeTrialPopup] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isComparison, setIsComparison] = useState<boolean>(false);
+  const [productMatricesCompetitor, setProductMatricesCompetitor] = useState<ProductData[]>([]);
 
 
   return (
@@ -32,7 +33,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       competitorProductName, setCompetitorProductName, competitorProductVisible, setCompetitorProductVisible,
       freeTrialPopup, setFreeTrialPopup,
       isVisible, setIsVisible,
-      isComparison, setIsComparison
+      isComparison, setIsComparison,
+      productMatricesCompetitor, setProductMatricesCompetitor
     }}>
       {children}
     </AuthContext.Provider>

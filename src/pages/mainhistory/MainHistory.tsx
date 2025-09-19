@@ -14,7 +14,7 @@ import { productMatrices } from "@/api/optimizationApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "@/component/loader/Loader";
-import RankingPopup from "@/component/rankingPopUp/RankingPopup";
+// import RankingPopup from "@/component/rankingPopUp/RankingPopup";
 
 
 interface ChatItem {
@@ -290,7 +290,8 @@ const MainHistory: React.FC = () => {
           </div>
         </div>
       ) : (
-        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMatrices} setProductVisible={setProductVisible} setOpenVisibility={setOpenVisibility} setVisibilityData={setVisibilityData} />
+        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMatrices} setProductVisible={setProductVisible} 
+        />
       )}
       {openVisibility && (
         <ExampleVisibilityDetails openVisibility={openVisibility} setOpenVisibility={setOpenVisibility} visibilityData={visibilityData} />

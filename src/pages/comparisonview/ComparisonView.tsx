@@ -80,7 +80,7 @@
 
 // export default ComparisonView;
 
-import React from "react";
+import React, { useState } from "react";
 import VisibilityChart from "./comparisoncomponent/VisibilityChart";
 import VisibilityChartUpdated from "./comparisoncomponent/VisibilityChartUpdated";
 import RankingTable from "./comparisoncomponent/RankingTable";
@@ -88,14 +88,14 @@ import MentionsBar from "./comparisoncomponent/MentionBar";
 import MentionsBarUpdated from "./comparisoncomponent/MentionBarUpdated";
 import { useProductMatrices } from "../../hooks/useProductMetrices";
 import { useAuth } from "@/authContext/useAuth";
+import ExampleVisibilityDetailsComparison from "@/component/VisibilityDetailComparison";
+import ExampleVisibilityDetails from "@/component/VisibilityDetails";
 
 interface ComparisonViewProps {
   optimizationRank: any;
   productVisible: boolean;
   productMatrices: (queryID: number, productName: string) => void;
   setProductVisible: (val: boolean) => void;
-  setOpenVisibility: React.Dispatch<React.SetStateAction<boolean>>;
-  setVisibilityData: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ComparisonView: React.FC<ComparisonViewProps> = ({
@@ -103,11 +103,15 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   productVisible,
   productMatrices,
   setProductVisible,
-  setOpenVisibility,
-  setVisibilityData,
 }) => {
   const { isLoading, error, isDataReady } = useProductMatrices();
   const { competitorProductVisible, setCompetitorProductVisible, yourProductName, competitorProductName } = useAuth();
+
+  const [openVisibility, setOpenVisibility] = useState(false);
+    const [visibilityData, setVisibilityData] = useState("");
+     const [openVisibilityCompetitor, setOpenVisibilityCompetitor] = useState(false);
+    const [visibilityDataCompetitor, setVisibilityDataCompetitor] = useState("");
+
 
   setCompetitorProductVisible(true);
   if (isLoading) {
@@ -141,44 +145,54 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   }
 
   return (
-    <div className="h-[calc(100vh-75px)] text-black flex flex-col lg:flex-row px-4 py-2">
-      {/* 1st column */}
-      <div className="w-full lg:w-1/3 flex flex-row lg:flex-col gap-2 p-2">
-        <h2 className="text-center text-lg font-semibold text-gray-900  border-1 rounded-xl">
-          {yourProductName}
-        </h2>
-        <VisibilityChart
-          setOpenVisibility={setOpenVisibility}
-          setVisibilityData={setVisibilityData}
-        />
-        <MentionsBar />
-      </div>
+    <>
+      <div className="h-[calc(100vh-75px)] text-black flex flex-col lg:flex-row px-4 py-2">
+        {/* 1st column */}
+        <div className="w-full lg:w-1/3 flex flex-row lg:flex-col gap-2 p-2">
+          <h2 className="text-center text-lg font-semibold text-gray-900  border-1 rounded-xl">
+            {yourProductName}
+          </h2>
+          <VisibilityChart
+            setOpenVisibility={setOpenVisibility}
+            setVisibilityData={setVisibilityData}
+          />
+          <MentionsBar />
+        </div>
 
-      {/* 2nd Column */}
-      <div className="w-full lg:w-2/3 p-2">
-      {/* <h2 className="text-center text-xl font-semibold text-gray-900 mb-2">
+        {/* 2nd Column */}
+        <div className="w-full lg:w-2/3 p-2">
+          {/* <h2 className="text-center text-xl font-semibold text-gray-900 mb-2">
           {yourProductName}
         </h2> */}
-        <RankingTable
-          optimizationRank={optimizationRank}
-          productVisible={productVisible}
-          productMatrices={productMatrices}
-          setProductVisible={setProductVisible}
-        />
+          <RankingTable
+            optimizationRank={optimizationRank}
+            productVisible={productVisible}
+            productMatrices={productMatrices}
+            setProductVisible={setProductVisible}
+          />
+        </div>
+
+        {/* 3rd Column */}
+        <div className="w-full lg:w-1/3 flex flex-row lg:flex-col gap-2 p-2">
+          <h2 className="text-center text-lg font-semibold text-gray-900 border-1 rounded-xl">
+            {competitorProductName}
+          </h2>
+          <VisibilityChartUpdated
+            setOpenVisibility={setOpenVisibilityCompetitor}
+            setVisibilityData={setVisibilityDataCompetitor}
+          />
+          <MentionsBarUpdated />
+        </div>
       </div>
 
-      {/* 3rd Column */}
-      <div className="w-full lg:w-1/3 flex flex-row lg:flex-col gap-2 p-2">
-      <h2 className="text-center text-lg font-semibold text-gray-900 border-1 rounded-xl">
-          {competitorProductName}
-        </h2>
-        <VisibilityChartUpdated
-          setOpenVisibility={setOpenVisibility}
-          setVisibilityData={setVisibilityData}
-        />
-        <MentionsBarUpdated />
-      </div>
-    </div>
+      {openVisibilityCompetitor && (
+        <ExampleVisibilityDetailsComparison openVisibility={openVisibilityCompetitor} setOpenVisibility={setOpenVisibilityCompetitor} visibilityData={visibilityDataCompetitor} />
+      )}
+
+      {openVisibility && (
+        <ExampleVisibilityDetails openVisibility={openVisibility} setOpenVisibility={setOpenVisibility} visibilityData={visibilityData} />
+      )}
+    </>
   );
 };
 

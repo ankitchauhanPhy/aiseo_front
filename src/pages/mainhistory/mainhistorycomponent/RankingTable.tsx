@@ -1,5 +1,5 @@
 import { Trophy, Medal, Award } from "lucide-react"
-import MainHoistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryRankingsChatgpt.svg";
+import MainHistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryVisibilityLogo3.svg";
 import MainHistoryRankingGemini from "../../../assets/mainHistory/MainHistoryRankingGemini.svg";
 import MainHistoryRankingPerplexity1 from "../../../assets/mainHistory/MainHistoryRankingPerplexity1.svg";
 import MainHistoryRankingPerplexity2 from "../../../assets/mainHistory/MainHistoryRankingPerplexity2.svg";
@@ -92,7 +92,7 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
 
   switch (type) {
     case "chatgpt":
-      iconSrc = MainHoistoryRankingChatgpt
+      iconSrc = MainHistoryRankingChatgpt
       break
     case "gemini":
       iconSrc = MainHistoryRankingGemini
@@ -108,7 +108,7 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
   }
 
   return (
-    <div className="w-8 h-8 flex items-center justify-center">
+    <div className="w-12 h-12 flex items-center justify-center">
       {iconSrc ? (
         <img src={iconSrc} alt={type} className="w-6 h-6 object-contain" />
       ) : (

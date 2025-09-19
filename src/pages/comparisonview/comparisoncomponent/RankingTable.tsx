@@ -1,6 +1,6 @@
 import { Trophy, Medal, Award } from "lucide-react"
 
-import MainHoistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryRankingsChatgpt.svg";
+import MainHoistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryVisibilityLogo3.svg";
 import MainHistoryRankingGemini from "../../../assets/mainHistory/MainHistoryRankingGemini.svg";
 import MainHistoryRankingPerplexity1 from "../../../assets/mainHistory/MainHistoryRankingPerplexity1.svg";
 import MainHistoryRankingPerplexity2 from "../../../assets/mainHistory/MainHistoryRankingPerplexity2.svg";
@@ -12,8 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Rankings from "../../../components/ui/popup";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+// import Rankings from "../../../components/ui/popup";
+// import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Competitor {
   name: string;
@@ -109,7 +109,7 @@ function PlatformIcon({
   }
 
   return (
-    <div className="w-8 h-8 flex items-center justify-center">
+    <div className="w-12 h-12 flex items-center justify-center">
       {iconSrc ? (
         <img src={iconSrc} alt={type} className="w-6 h-6 object-contain" />
       ) : (
