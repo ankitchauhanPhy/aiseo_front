@@ -59,18 +59,19 @@ const ChatHistory: React.FC = () => {
   ];
 
   const [inputValue, setInputValue] = useState('');
-  
+
   const [loading, setLoading] = useState<boolean>(false);
   const [checkProcessStep, setCheckProcessStep] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [chat, setChat] = useState<ChatItem[]>([]);
   const [title, setTitle] = useState<string>("");
   const [historyLoading, setHistoryLoading] = useState<boolean>(false);
- const nav = useNavigate();
+  const [callAPI, setCallAPI] = useState<boolean>(false);
+  const nav = useNavigate();
 
   const { firstChatText, setFirstChatText, queryID, setQueryID, conversationData, setConversationData, setComparisonView, setIsComparison, setIsVisible, user_id } = useAuth();
 
- 
+
   console.log("error", error);
   const [processSteps, setProcessSteps] = useState<StepProcess[]>([
     { id: 1, text: 'Creating Queries', badge: 'Query 1', completed: false, active: true },
@@ -112,7 +113,7 @@ const ChatHistory: React.FC = () => {
   // }
 
   async function getAllHistory(user_id: number) {
-    if(!user_id){
+    if (!user_id) {
       toast.warning("UserId not have");
       return;
     }
@@ -138,30 +139,30 @@ const ChatHistory: React.FC = () => {
   }
 
   useEffect(() => {
-    if(user_id){
-    setComparisonView(false);
-    setIsComparison(false);
-    setIsVisible(false);
-    getAllHistory(user_id);
+    if (user_id) {
+      setComparisonView(false);
+      setIsComparison(false);
+      setIsVisible(false);
+      getAllHistory(user_id);
     }
   }, [user_id])
 
   useEffect(() => {
-  if (!localStorage.getItem("chatMainHistoryTourDone")) {
-    const timer = setTimeout(() => {
-      startTour(steps);
-      localStorage.setItem("chatMainHistoryTourDone", "true");
-    }, 500);
+    if (!localStorage.getItem("chatMainHistoryTourDone")) {
+      const timer = setTimeout(() => {
+        startTour(steps);
+        localStorage.setItem("chatMainHistoryTourDone", "true");
+      }, 500);
 
-    return () => clearTimeout(timer);
-  }
-}, []);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
 
   const handleSelectHistory = (userId: number, conversationId: number) => {
     console.log("conversationId chathistory handleselecet", userId, conversationId);
     nav("/optimization", {
-      state: { userId: userId, conversationId: conversationId}
+      state: { userId: userId, conversationId: conversationId }
     })
   };
 
@@ -239,13 +240,15 @@ const ChatHistory: React.FC = () => {
     return () => clearInterval(interval);
   }, [queryID]);
 
-  async function callChatTextAPI(userMessage: string) {
+  async function callChatTextAPI(userMessage: string, userID: number) {
+    console.log("callChatTextApi chathistory", userID);
     setLoading(true);
     setError("");
     try {
-      const response = await ChatTextAPI.sendCheckQuery(userMessage);
+      const response = await ChatTextAPI.sendCheckQuery(userMessage, userID);
       console.log("API Response:", response);
       if (response.statusText) {
+        setCallAPI(true);
         setLoading(false);
         if (response.data.query_id) {
           setQueryID(response.data.query_id);
@@ -275,6 +278,7 @@ const ChatHistory: React.FC = () => {
   console.log("chat205 chatHistory", chat);
 
   async function callChatTextAPIPipeline(userMessage: string, userID: number) {
+    console.log("callChatTextApiPipeline chathistory", userID);
     setLoading(true);
     setError("");
     try {
@@ -313,7 +317,7 @@ const ChatHistory: React.FC = () => {
 
       // Push AI placeholder
       setChat(prev => [...prev, { id: "assistant", title: "", loading: true }]);
-      callChatTextAPI(firstChatText);
+      callChatTextAPI(firstChatText, user_id);
       setFirstChatText("");
       setCheckProcessStep(false);
     } else {
@@ -343,7 +347,11 @@ const ChatHistory: React.FC = () => {
     // Push AI placeholder
     setChat(prev => [...prev, { id: "assistant", title: "", loading: true }]);
 
-    callChatTextAPIPipeline(userMessage, user_id);
+    if (!callAPI) {
+      callChatTextAPI(userMessage, user_id);
+    } else if (callAPI) {
+      callChatTextAPIPipeline(userMessage, user_id);
+    }
   };
 
   return (
@@ -391,7 +399,7 @@ const ChatHistory: React.FC = () => {
               ))
             ) : (
               // <p className="text-gray-400 text-sm text-center py-4">No Data Found</p>
-              <NoDataFound/>
+              <NoDataFound />
             )
           )}
 
