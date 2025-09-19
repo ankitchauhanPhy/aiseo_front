@@ -43,6 +43,7 @@ const ChatHistory: React.FC = () => {
     {
       target: ".history-sidebar",
       content: "Here you'll find your previous searches and suggestions.",
+      placement: "right",
     },
     {
       target: ".chat-area",
@@ -129,10 +130,10 @@ const ChatHistory: React.FC = () => {
   }, [])
 
   useEffect(() => {
-  if (!localStorage.getItem("chatHistoryTourDone")) {
+  if (!localStorage.getItem("chatMainHistoryTourDone")) {
     const timer = setTimeout(() => {
       startTour(steps);
-      localStorage.setItem("chatHistoryTourDone", "true");
+      localStorage.setItem("chatMainHistoryTourDone", "true");
     }, 500);
 
     return () => clearTimeout(timer);
