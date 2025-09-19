@@ -3,17 +3,20 @@ import './index.css'
 import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './authContext/AuthProvider.tsx'
+import { OnboardingProvider } from './context/OnboardingProvider.tsx'
 
 import "react-toastify/dist/ReactToastify.css";
 
 
 
 createRoot(document.getElementById('root')!).render(
-  
-    <BrowserRouter basename='/aiseo'>
-      <AuthProvider>
+
+  <BrowserRouter basename='/aiseo'>
+    <AuthProvider>
+      <OnboardingProvider>
         <App />
-      </AuthProvider>
-    </BrowserRouter>
+      </OnboardingProvider>
+    </AuthProvider>
+  </BrowserRouter>
 
 )

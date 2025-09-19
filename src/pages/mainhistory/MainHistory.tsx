@@ -11,6 +11,9 @@ import VisibilityNoDataFound from "./mainhistorycomponent/VisibilityNoDataFound"
 import MentionBarNoDataFound from "./mainhistorycomponent/MentionBarNoDataFound";
 import VisibilityChart2 from "./mainhistorycomponent/VisibilityChart2";
 import { productMatrices } from "@/api/optimizationApi";
+import { useOnboarding } from "../../context/OnboardingProvider";
+import { Step } from 'react-joyride';
+
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "@/component/loader/Loader";
@@ -39,6 +42,8 @@ const MainHistory: React.FC = () => {
     rankings: []
   })
   const [productVisible, setProductVisible] = useState(false);
+  // const { comparisonView, queryID, setProductMatricesData } = useAuth();
+  const { startTour } = useOnboarding();
   const [chat, setChat] = useState<ChatItem[]>([]);
   const [singleConversationId, setSingleConversationId] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -52,7 +57,74 @@ const MainHistory: React.FC = () => {
 
   const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData, setIsVisible, setIsComparison, user_id } = useAuth();
 
+  // Joyride steps configuration
+  const tourSteps: Step[] = [
+    {
+      target: ".your-query-card",
+      content:
+        "This panel shows the query you just searched for. You can start a new search any time from here.",
+      placement: "bottom" as const,
+    },
+    {
+      target: ".history-section",
+      content:
+        "Here you can see your recent searches for quick access.",
+      placement: "bottom" as const,
+    },
+    {
+      target: ".rankings-section",
+      content:
+        "This is the rankings table. Compare how different products rank across AI sources (OpenAI, Gemini, Perplexity).",
+      placement: "left" as const,
+    },
+    {
+      target: ".visibility-section",
+      content:
+        "Here you'll see detailed analytics and metrics for the selected product.",
+      placement: "top" as const,
+    },
+    {
+      target: ".mentions-section",
+      content:
+        "This panel shows mentions, reviews, or competitor data for the selected product.",
+      placement: "top" as const,
+    },
+    {
+      target: '[data-tour="ranking-row-0"]',
+      content:
+        "Clicking the first product will show its details in the panel on the left.",
+      placement: "right",
+    },
+    {
+      target: '[data-tour="visibility-section"]',
+      content:
+        "Select visibility or comparison to show metrics and compare metrics.",
+      placement: "bottom" as const,
+    },
 
+    // {
+    //   target: '[data-tour="ranking-row-2"]', 
+    //   content:
+    //     "Clicking the second product will take you to the Comparison Stats page.",
+    //   placement: "right",
+    // },
+    {
+      target: '[data-tour="rankings-table"]', // or 'body' for center overlay
+      content: 'Welcome! Click on a product to see its details or compare it. Happy Searching',
+      placement: 'center'
+    }
+  ];
+
+  useEffect(() => {
+    if (!localStorage.getItem("chatHistoryTourDone")) {
+      const timer = setTimeout(() => {
+        startTour(tourSteps);
+        localStorage.setItem("chatHistoryTourDone", "true");
+      }, 500); // delay 1 second
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, []);
   async function singleHistory(userId: number, conversationId: number) {
     try {
       setLoading(true);
@@ -186,13 +258,13 @@ const MainHistory: React.FC = () => {
       {!comparisonView ? (
         <div className="h-[calc(100vh-75px)] bg-white text-black flex lg:overflow-hidden overflow-y-auto">
           {/* Main Content */}
-          <div className="p-4 flex gap-4 flex flex-col lg:flex-row w-full max-h-screen">
+          <div className="p-4 flex gap-4 flex-col lg:flex-row w-full max-h-screen">
 
             {/* Left Column */}
             <div className="flex flex-col w-full lg:w-[25%] xl:w-[350px] gap-2 h-full">
               {/* Query Box */}
               <div className="flex lg:items-start items-center justify-center lg:justify-start pb-3 pt-0">
-                <div className="w-full rounded-2xl shadow-xl bg-white border border-gray-200 p-4 text-black">
+                <div className="your-query-card w-full rounded-2xl shadow-xl bg-white border border-gray-200 p-4 text-black">
                   {/* Header */}
                   <div className="relative flex justify-between items-center border-b border-gray-200 pb-3 mb-4">
                     <h2 className="text-sm font-semibold text-gray-700">Your Query</h2>
@@ -237,13 +309,12 @@ const MainHistory: React.FC = () => {
                     />
                     <p className="text-sm text-gray-500">Thinking...</p>
                   </div>
-
                 </div>
               </div>
 
               {/* History Box */}
               <div className="flex lg:items-start items-center justify-center lg:justify-start flex-1 overflow-hidden">
-                <div className="w-full rounded-2xl shadow-xl bg-white border border-gray-200 p-4 text-black flex flex-col h-full">
+                <div className="history-section w-full rounded-2xl shadow-xl bg-white border border-gray-200 p-4 text-black flex flex-col h-full">
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-6 border-b border-gray-200">
                     <h2 className="text-sm font-semibold text-black">
@@ -286,22 +357,25 @@ const MainHistory: React.FC = () => {
               </div>
             </div>
 
-
             {/* Middle Column */}
-            <div className="flex flex-col gap-4 lg:w-[30%] flex-1">
-
+            <div className="flex flex-col  lg:w-[30%] flex-1">
               {/* Visibility */}
-              {productVisible ? (
-                <>
+              <div className="visibility-section h-full">
+                {productVisible ? (
                   <VisibilityChart2 setOpenVisibility={setOpenVisibility} setVisibilityData={setVisibilityData} />
-                  <MentionsBar />
-                </>
-              ) : (
-                <>
+                ) : (
                   <VisibilityNoDataFound />
+                )}
+              </div>
+
+              {/* Mentions */}
+              <div className="mentions-section h-full">
+                {productVisible ? (
+                  <MentionsBar />
+                ) : (
                   <MentionBarNoDataFound />
-                </>
-              )}
+                )}
+              </div>
             </div>
 
             {/* Right Column (Rankings) */}
@@ -317,7 +391,11 @@ const MainHistory: React.FC = () => {
         />
       )}
       {openVisibility && (
-        <ExampleVisibilityDetails openVisibility={openVisibility} setOpenVisibility={setOpenVisibility} visibilityData={visibilityData} />
+        <ExampleVisibilityDetails
+          openVisibility={openVisibility}
+          setOpenVisibility={setOpenVisibility}
+          visibilityData={visibilityData}
+        />
       )}
 
 

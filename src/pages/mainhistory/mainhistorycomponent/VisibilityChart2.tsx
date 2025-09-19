@@ -39,7 +39,7 @@ interface VisibilityProps {
 const VisibilityChart2: React.FC<VisibilityProps> = ({ setOpenVisibility, setVisibilityData }) => {
 
   return (
-    <Card className="w-full bg-white relative lg:h-[40%] h-[50%]">
+    <Card className="w-full bg-white relative lg:h-[full] h-[full]">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-semibold text-gray-900">Visibility</CardTitle>

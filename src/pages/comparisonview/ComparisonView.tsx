@@ -146,7 +146,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 
   return (
     <>
-      <div className="h-[calc(100vh-75px)] text-black flex flex-col lg:flex-row px-4 py-2">
+      <div 
+      data-tour='rankings-table'
+      className="h-[calc(100vh-75px)] text-black flex flex-col lg:flex-row px-4 py-2">
         {/* 1st column */}
         <div className="w-full lg:w-1/3 flex flex-row lg:flex-col gap-2 p-2">
           <h2 className="text-center text-lg font-semibold text-gray-900  border-1 rounded-xl">

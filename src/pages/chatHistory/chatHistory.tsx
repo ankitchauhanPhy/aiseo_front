@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { History, ChevronRight, Loader2 } from 'lucide-react';
+import { Step } from 'react-joyride';
 
 import ChatHistoryLoading from "../../assets/chatHistory/ChatHistoryLoading.gif"
 import { useAuth } from '@/authContext/useAuth';
 import { ChatTextAPI, HistoryAPI } from '@/api';
 import ChatMessage from '@/component/ChatMessage';
+import { useOnboarding } from '@/context/OnboardingProvider';
+// import ExpandableInput from '@/component/ExpandableInput';
 
 import { toast } from "react-toastify";
 import Loader from '@/component/loader/Loader';
-import { useNavigate } from 'react-router-dom';
 import NoDataFound from '@/component/noDataFound/NoDataFound';
+import { useNavigate } from 'react-router-dom';
 
 
 interface ChatItem {
@@ -17,7 +20,7 @@ interface ChatItem {
   title: string;
   loading: boolean;
 }
-interface Step {
+interface StepProcess {
   id: number;
   text: string;
   badge?: string;
@@ -30,7 +33,33 @@ interface Step {
 // }
 
 const ChatHistory: React.FC = () => {
+
+  // Joyride states
+  const { startTour } = useOnboarding();
+  // const [run, setRun] = useState(true);
+
+  const steps: Step[] = [
+    {
+      target: ".nav-bar",
+      content: "Use the navigation bar to move between Home, Dashboard, and Settings.",
+    },
+    {
+      target: ".history-sidebar",
+      content: "Here you'll find your previous searches and suggestions.",
+      placement: "right",
+    },
+    {
+      target: ".chat-area",
+      content: "This is where AI shows you product rankings and insights.",
+    },
+    {
+      target: ".input-box",
+      content: "Type your question or product search here and press Enter.",
+    },
+  ];
+
   const [inputValue, setInputValue] = useState('');
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [checkProcessStep, setCheckProcessStep] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -43,7 +72,7 @@ const ChatHistory: React.FC = () => {
 
  
   console.log("error", error);
-  const [processSteps, setProcessSteps] = useState<Step[]>([
+  const [processSteps, setProcessSteps] = useState<StepProcess[]>([
     { id: 1, text: 'Creating Queries', badge: 'Query 1', completed: false, active: true },
     { id: 2, text: 'Analysing based on queries', badge: 'Processing', completed: false, active: false },
     { id: 3, text: 'Getting Products Info', badge: 'Gathering Information', completed: false, active: false },
@@ -117,13 +146,24 @@ const ChatHistory: React.FC = () => {
     }
   }, [user_id])
 
+  useEffect(() => {
+  if (!localStorage.getItem("chatMainHistoryTourDone")) {
+    const timer = setTimeout(() => {
+      startTour(steps);
+      localStorage.setItem("chatMainHistoryTourDone", "true");
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }
+}, []);
+
+
   const handleSelectHistory = (userId: number, conversationId: number) => {
     console.log("conversationId chathistory handleselecet", userId, conversationId);
     nav("/optimization", {
       state: { userId: userId, conversationId: conversationId}
     })
   };
-
 
   // Polling for query status when process step starts
   useEffect(() => {
@@ -198,8 +238,6 @@ const ChatHistory: React.FC = () => {
 
     return () => clearInterval(interval);
   }, [queryID]);
-
-
 
   async function callChatTextAPI(userMessage: string) {
     setLoading(true);
@@ -324,7 +362,7 @@ const ChatHistory: React.FC = () => {
       ></div>
 
       {/* Sidebar */}
-      <div className="ml-5 border-2 border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden ">
+      <div className="ml-5 border-2 border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden history-sidebar">
         {/* Header */}
         <div className="p-4 border-b-2 border-gray-300 flex-shrink-0">
           <div className="flex items-center gap-2 text-black-400 text-sm ">
@@ -358,12 +396,10 @@ const ChatHistory: React.FC = () => {
           )}
 
         </div>
-
       </div>
 
-
       {/* Main Content */}
-      <div className="mr-5 ml-10 flex-1 rounded-lg flex flex-col h-full md:overflow-hidden ">
+      <div className="chat-area mr-5 ml-10 flex-1 rounded-lg flex flex-col h-full md:overflow-hidden ">
         {/* Header */}
         <div className="border-b-2 p-3 border-gray-400 flex-shrink-0">
           <h1 className="text-xl font-semibold">{title ? title : "Chat History"}</h1>
@@ -401,14 +437,11 @@ const ChatHistory: React.FC = () => {
           </div>
         </div>
 
-
-
         {/* Bottom Animation + Steps (Fixed inside content) */}
         {checkProcessStep && queryID ? (
           <div className="p-6 flex-shrink-0 ">
             <div className="flex gap-6 items-center justify-center">
               {/* Left side - Animation */}
-
               <div className="flex items-center justify-center">
                 <img
                   src={ChatHistoryLoading} // place your gif inside public/ folder
@@ -467,8 +500,8 @@ const ChatHistory: React.FC = () => {
         ) : ""}
 
         {/* Input Area (Fixed bottom) */}
-        <div className={`p-6 flex-shrink-0 ${loading && "cursor-not-allowed"}  `}>
-          <div className="bg-[#D9D9D9] h-32 rounded-3xl p-3 flex flex-col border-2 border-gray-300">
+        <div className={`input-box p-6 flex-shrink-0 ${loading && "cursor-not-allowed"}`}>
+          <div className="bg-[#D9D9D9] h-32 rounded-lg p-3 flex flex-col border-2 border-gray-300">
             <textarea
               placeholder="Write anything..."
               value={inputValue}
@@ -489,6 +522,7 @@ const ChatHistory: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* <ExpandableInput/> */}
 
       </div >
     </div >
