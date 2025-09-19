@@ -173,7 +173,7 @@ const MainHistory: React.FC = () => {
         setLoading(false);
         setConversationData(response.data);
         if (!userId && !conversationId) {
-          singleHistory(1, response.data.conversations[0]?.conversation_id);
+          singleHistory(user_id, response.data.conversations[0]?.conversation_id);
         }
       }
     } catch (err: any) {

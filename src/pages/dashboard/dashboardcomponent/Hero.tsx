@@ -169,7 +169,7 @@ console.log("user_id", user_id);
                           className="p-3 bg-gray-100 rounded-md hover:bg-gray-300 cursor-pointer"
                           onClick={() => {
                             nav("/optimization", {
-                              state: { userId: 1, conversationId: c.conversation_id }
+                              state: { userId: user_id, conversationId: c.conversation_id }
                             })
                           }}
                         >

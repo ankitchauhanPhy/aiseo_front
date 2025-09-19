@@ -5,8 +5,8 @@ export const sendCheckQuery = async (inputValue: string) => {
     return response;
 }
 
-export const sendPipelineQuery = async (inputValue: string) => {
-    const response = await axiosClient.post("/pipeline", { query: inputValue, user_id: 1 });
+export const sendPipelineQuery = async (inputValue: string, user_id:number) => {
+    const response = await axiosClient.post("/pipeline", { query: inputValue, user_id: user_id });
     return response;
 }
 

@@ -274,11 +274,11 @@ const ChatHistory: React.FC = () => {
 
   console.log("chat205 chatHistory", chat);
 
-  async function callChatTextAPIPipeline(userMessage: string) {
+  async function callChatTextAPIPipeline(userMessage: string, userID: number) {
     setLoading(true);
     setError("");
     try {
-      const response = await ChatTextAPI.sendPipelineQuery(userMessage);
+      const response = await ChatTextAPI.sendPipelineQuery(userMessage, userID);
       console.log("API Response:", response);
       if (response.statusText) {
         setLoading(false);
@@ -343,7 +343,7 @@ const ChatHistory: React.FC = () => {
     // Push AI placeholder
     setChat(prev => [...prev, { id: "assistant", title: "", loading: true }]);
 
-    callChatTextAPIPipeline(userMessage);
+    callChatTextAPIPipeline(userMessage, user_id);
   };
 
   return (
@@ -382,7 +382,7 @@ const ChatHistory: React.FC = () => {
                   key={c.conversation_id}
                   className={`p-4 hover:bg-gray-300  rounded-lg cursor-pointer`}
                   // onClick={() => { singleHistory(1, c.conversation_id); setSelectedHistory(true); setSelectedConversationId(c.conversation_id) }}
-                  onClick={() => { handleSelectHistory(1, c.conversation_id); setTitle(c.last_user_query) }}
+                  onClick={() => { handleSelectHistory(user_id, c.conversation_id); setTitle(c.last_user_query) }}
                 >
                   <h3 className="text-black  text-sm font-medium  mb-1">
                     {c.last_user_query}

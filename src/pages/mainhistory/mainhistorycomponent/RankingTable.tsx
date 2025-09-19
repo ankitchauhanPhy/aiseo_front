@@ -207,7 +207,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                   <div 
                     data-tour="visibility-section"
                     className="flex flex-col gap-2 mt-1">
-                      {competitors.length> 0 &&(
+                      {competitors.length > 0 &&(
                     <label className="flex items-center gap-1 text-sm text-gray-700 font-semibold">
                       <input type="checkbox" className="accent-purple-600 mr-2"
                         checked={isVisible}
