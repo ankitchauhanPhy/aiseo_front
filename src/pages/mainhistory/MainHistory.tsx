@@ -99,7 +99,7 @@ const MainHistory: React.FC = () => {
         "Select visibility or comparison to show metrics and compare metrics.",
       placement: "bottom" as const,
     },
-    
+
     // {
     //   target: '[data-tour="ranking-row-2"]', 
     //   content:
@@ -315,14 +315,26 @@ const MainHistory: React.FC = () => {
                       (conversationData?.conversations && conversationData.conversations.length > 0) && conversationData.conversations.map((c, index) => (
                         <div
                           key={index}
-                          className={`px-4 py-3 ${conversationId ? (c.conversation_id === conversationId ? "bg-gray-600 text-white" : "")
-                            : (singleConversationId === c.conversation_id) ? "bg-gray-600 text-white" : ""} hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
-                          onClick={() => { singleHistory(1, c.conversation_id); setIsVisible(false); setIsComparison(false) }}
+                          className={`px-4 py-3 rounded-lg cursor-pointer transition 
+                              ${singleConversationId === 0
+                              ? conversationId && c.conversation_id === conversationId
+                                ? "bg-gray-600 text-white"
+                                : ""
+                              : singleConversationId === c.conversation_id
+                                ? "bg-gray-600 text-white"
+                                : ""
+                            }
+                              hover:bg-gray-400 hover:text-white
+                            `}
+                          onClick={() => {
+                            singleHistory(1, c.conversation_id);
+                            setIsVisible(false);
+                            setIsComparison(false);
+                          }}
                         >
                           <p className="text-sm font-medium">{c.last_user_query}</p>
                         </div>
-                      ))
-                    )}
+                      )))}
 
                   </div>
 
@@ -335,9 +347,9 @@ const MainHistory: React.FC = () => {
             </div>
 
             {/* Middle Column */}
-            <div className="flex flex-col gap-4 lg:w-[30%] flex-1">
+            <div className="flex flex-col  lg:w-[30%] flex-1">
               {/* Visibility */}
-              <div className="visibility-section">
+              <div className="visibility-section h-full">
                 {productVisible ? (
                   <VisibilityChart2 setOpenVisibility={setOpenVisibility} setVisibilityData={setVisibilityData} />
                 ) : (
@@ -346,7 +358,7 @@ const MainHistory: React.FC = () => {
               </div>
 
               {/* Mentions */}
-              <div className="mentions-section">
+              <div className="mentions-section h-full">
                 {productVisible ? (
                   <MentionsBar />
                 ) : (
