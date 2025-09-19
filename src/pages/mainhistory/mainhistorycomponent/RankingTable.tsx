@@ -203,7 +203,9 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                 {/* Name + Checkboxes */}
                 <div className="flex flex-col">
                   {/* Checkboxes */}
-                  <div className="flex flex-col gap-2 mt-1">
+                  <div 
+                    data-tour="visibility-section"
+                    className="flex flex-col gap-2 mt-1">
                     <label className="flex items-center gap-1 text-sm text-gray-700 font-semibold">
                       <input type="checkbox" className="accent-purple-600 mr-2"
                         checked={isVisible}
@@ -246,6 +248,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                 competitors.length > 0 &&
                 competitors.map((competitor, index) => (
                   <div
+                    data-tour={`ranking-row-${index}`}
                     key={index}
                     className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] 
                              ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-blue-300"} 

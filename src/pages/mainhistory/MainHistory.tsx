@@ -46,7 +46,7 @@ const MainHistory: React.FC = () => {
   const [chat, setChat] = useState<ChatItem[]>([]);
   const [singleConversationId, setSingleConversationId] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
- const  [noData, setNoData] = useState<boolean>(false);
+  const [noData, setNoData] = useState<boolean>(false);
 
   const nav = useNavigate();
   const location = useLocation();
@@ -88,17 +88,24 @@ const MainHistory: React.FC = () => {
       placement: "top" as const,
     },
     {
-      target: '[data-tour="ranking-row-0"]', // first row
+      target: '[data-tour="ranking-row-0"]',
       content:
         "Clicking the first product will show its details in the panel on the left.",
       placement: "right",
     },
     {
-      target: '[data-tour="ranking-row-1"]', // second row
+      target: '[data-tour="visibility-section"]',
       content:
-        "Clicking the second product will take you to the Comparison Stats page.",
-      placement: "right",
+        "Select visibility or comparison to show metrics and compare metrics.",
+      placement: "bottom" as const,
     },
+    
+    // {
+    //   target: '[data-tour="ranking-row-2"]', 
+    //   content:
+    //     "Clicking the second product will take you to the Comparison Stats page.",
+    //   placement: "right",
+    // },
     {
       target: '[data-tour="rankings-table"]', // or 'body' for center overlay
       content: 'Welcome! Click on a product to see its details or compare it. Happy Searching',
@@ -106,16 +113,16 @@ const MainHistory: React.FC = () => {
     }
   ];
 
-useEffect(() => {
-  if (!localStorage.getItem("chatHistoryTourDone")) {
-    const timer = setTimeout(() => {
-      startTour(tourSteps);
-      localStorage.setItem("chatHistoryTourDone", "true");
-    }, 500); // delay 1 second
+  useEffect(() => {
+    if (!localStorage.getItem("chatHistoryTourDone")) {
+      const timer = setTimeout(() => {
+        startTour(tourSteps);
+        localStorage.setItem("chatHistoryTourDone", "true");
+      }, 500); // delay 1 second
 
-    return () => clearTimeout(timer); // cleanup
-  }
-}, []);
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, []);
   async function singleHistory(userId: number, conversationId: number) {
     try {
       setLoading(true);
@@ -214,7 +221,7 @@ useEffect(() => {
         if (response.statusText) {
           setLoading(false);
           setOptimizationRank(response.data);
-          if(response.data.rankings.length === 0){
+          if (response.data.rankings.length === 0) {
             setNoData(true);
           }
           if (response.data.product_visible) {
@@ -350,14 +357,14 @@ useEffect(() => {
 
             {/* Right Column (Rankings) */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col w-full lg:w-[40%] xl:w-[50%] ">
-              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} 
-              loading={loading} noData={noData} 
+              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible}
+                loading={loading} noData={noData}
               />
             </div>
           </div>
         </div>
       ) : (
-        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMatrices} setProductVisible={setProductVisible} 
+        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMatrices} setProductVisible={setProductVisible}
         />
       )}
       {openVisibility && (
@@ -368,7 +375,7 @@ useEffect(() => {
         />
       )}
 
-      
+
 
     </>
   );

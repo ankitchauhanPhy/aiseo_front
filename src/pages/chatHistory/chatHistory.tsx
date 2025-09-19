@@ -7,11 +7,11 @@ import { useAuth } from '@/authContext/useAuth';
 import { ChatTextAPI, HistoryAPI } from '@/api';
 import ChatMessage from '@/component/ChatMessage';
 import { useOnboarding } from '@/context/OnboardingProvider';
-import ExpandableInput from '@/component/ExpandableInput';
+// import ExpandableInput from '@/component/ExpandableInput';
 
 import { toast } from "react-toastify";
 import Loader from '@/component/loader/Loader';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 interface ChatItem {
