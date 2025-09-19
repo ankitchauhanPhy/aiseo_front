@@ -9,6 +9,7 @@ import ChatMessage from '@/component/ChatMessage';
 import { toast } from "react-toastify";
 import Loader from '@/component/loader/Loader';
 import { useNavigate } from 'react-router-dom';
+import NoDataFound from '@/component/noDataFound/NoDataFound';
 
 
 interface ChatItem {
@@ -38,7 +39,7 @@ const ChatHistory: React.FC = () => {
   const [historyLoading, setHistoryLoading] = useState<boolean>(false);
  const nav = useNavigate();
 
-  const { firstChatText, setFirstChatText, queryID, setQueryID, conversationData, setConversationData, setComparisonView, setIsComparison, setIsVisible } = useAuth();
+  const { firstChatText, setFirstChatText, queryID, setQueryID, conversationData, setConversationData, setComparisonView, setIsComparison, setIsVisible, user_id } = useAuth();
 
  
   console.log("error", error);
@@ -81,10 +82,14 @@ const ChatHistory: React.FC = () => {
   //   }
   // }
 
-  async function getAllHistory() {
+  async function getAllHistory(user_id: number) {
+    if(!user_id){
+      toast.warning("UserId not have");
+      return;
+    }
     setHistoryLoading(true);
     try {
-      const response = await HistoryAPI.getAllhistory(1);
+      const response = await HistoryAPI.getAllhistory(user_id);
       console.log("API Response:", response);
       if (response.statusText) {
         setConversationData(response.data);
@@ -104,11 +109,13 @@ const ChatHistory: React.FC = () => {
   }
 
   useEffect(() => {
+    if(user_id){
     setComparisonView(false);
     setIsComparison(false);
     setIsVisible(false);
-    getAllHistory();
-  }, [])
+    getAllHistory(user_id);
+    }
+  }, [user_id])
 
   const handleSelectHistory = (userId: number, conversationId: number) => {
     console.log("conversationId chathistory handleselecet", userId, conversationId);
@@ -345,7 +352,8 @@ const ChatHistory: React.FC = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-400 text-sm text-center py-4">No Data Found</p>
+              // <p className="text-gray-400 text-sm text-center py-4">No Data Found</p>
+              <NoDataFound/>
             )
           )}
 

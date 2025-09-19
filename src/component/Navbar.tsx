@@ -19,19 +19,30 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
   const nav = useNavigate();
 
   // get context values
-  const { setShowLoginup, loginType, setLoginType, comparisonView, setComparisonView } = useAuth();
+  const { setShowLoginup, loginType, setLoginType, comparisonView, setComparisonView, setUser_id} = useAuth();
+
+  useEffect(() => {
+    if (loginType) {
+      const fullName = localStorage.getItem("Name");
+      
+      if (fullName) {
+        setFullname(fullName);
+      }
+    }
+  }, [loginType])
 
   useEffect(()=>{
-    if(loginType){
-   const  fullName =  localStorage.getItem("Name");
-   if(fullName){
-    setFullname(fullName);
-   }
-    }
-  },[loginType])
+    const userid = localStorage.getItem("use_iD");
+    if(userid){
+  setUser_id(Number(userid));
+  }
+  },[])
+
+
 
   function removeLoginToken() {
     localStorage.removeItem("login");
+    localStorage.removeItem("use_iD");
     setLoginType(false);
     setOpen(false);
     nav("/");
@@ -63,7 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
                 <button className="bg-purple-500 hover:bg-purple-600 px-6 py-2 rounded-md font-semibold text-white"
                   onClick={() => setShowLoginup(true)}
                 >
-                  Login 
+                  Login
                 </button>
               </div>
 
@@ -105,7 +116,7 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
                   <a href="#" className="hover:text-purple-200">About Us</a>
                   <a href="#" className="hover:text-purple-200">Pricing</a>
                   <button className="bg-purple-500 hover:bg-purple-600 px-6 py-2 rounded-md font-medium text-white mt-2">
-                    Login 
+                    Login
                   </button>
                 </div>
               )}
@@ -124,10 +135,10 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
                     <div className="flex flex-col gap-2">
                       <h1 className="font-bold">Comparison View</h1>
                       <div className="flex items-center gap-2 cursor-pointer hover:text-purple-200"
-                      onClick={()=>{
-                        setComparisonView(false)
-                        nav("/optimization")
-                      }}
+                        onClick={() => {
+                          setComparisonView(false)
+                          nav("/optimization")
+                        }}
                       >
                         <ArrowLeft className="w-4 h-4" />
                         <span>Back to Analysis</span>
@@ -137,9 +148,9 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
                 ) : (
                   <>
                     <Link to="/" >Home</Link>
-                    <a href="#" className="hover:text-purple-200">Dashboard</a>
+                    {/* <a href="#" className="hover:text-purple-200">Dashboard</a> */}
                     <Link to="/optimization" >Optimization</Link>
-                    <a href="#" className="hover:text-purple-200">Settings</a>
+                    {/* <a href="#" className="hover:text-purple-200">Settings</a> */}
                   </>
                 )}
 

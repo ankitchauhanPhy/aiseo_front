@@ -21,7 +21,7 @@ const LoginPopup = () => {
   const nav = useNavigate();
 
   //get Context Value
-  const { setShowSignup, setShowLoginup, setFreeTrialPopup } = useAuth();
+  const { setShowSignup, setShowLoginup, setFreeTrialPopup, setUser_id } = useAuth();
 
   const [formData, setFormData] = useState<LoginForm>({
     email: "",
@@ -102,6 +102,7 @@ const validateForm = () => {
         localStorage.setItem("use_iD", data.user.id);
         localStorage.setItem("Name", `${data.user.first_name} ${data.user.last_name}`);
         toast.success("Log in Sucess!");
+        setUser_id(data.user.id);
         setLoading(false);
         setShowLoginup(false);
         setFreeTrialPopup(true);

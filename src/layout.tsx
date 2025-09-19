@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation} from "react-router-dom";
 import Navbar from "@/component/Navbar";
+import { useAuth } from "./authContext/useAuth";
 
 const Layout: React.FC = () => {
   const [afterLogin, setAfterLogin] = useState<boolean>(false);
   const location =  useLocation();
+  const{ setUser_id} = useAuth();
 
   useEffect(()=>{
     const islogin = localStorage.getItem("login");
-    console.log("isLogin layout", islogin);
+    const userid = localStorage.getItem("use_iD");
+    console.log("isLogin layout", islogin, userid);
     if(islogin === "true"){
       setAfterLogin(true);
     }else{
+      setUser_id(Number(userid));
       setAfterLogin(false);
     }
   },[location.key])

@@ -11,6 +11,7 @@ import { WelcomePopup } from "@/component/freeTrialPopUp/WelcomePopup";
 import MainLogo from "../../../assets/dashboard/MainLogoDashboard.svg";
 import { toast } from "react-toastify";
 import Loader from "@/component/loader/Loader";
+import NoDataFound from "@/component/noDataFound/NoDataFound";
 
 
 export default function HeroSection() {
@@ -34,21 +35,27 @@ export default function HeroSection() {
     firstChatText,
     setComparisonView,
     setIsVisible,
-    setIsComparison
+    setIsComparison,
+    user_id
   } = useAuth();
 
   const nav = useNavigate();
-
-  async function getAllHistory() {
+console.log("user_id", user_id);
+  async function getAllHistory(user_id: number) {
+     if(!user_id){
+          toast.warning("UserId not have");
+          return;
+        }
     setLoading(true);
     try {
-      const response = await HistoryAPI.getAllhistory(1);
+      const response = await HistoryAPI.getAllhistory(user_id);
       console.log("API Response:", response);
       if (response.statusText) {
         setConversationData(response.data);
         setLoading(false);
       }
     } catch (err: any) {
+      setLoading(false);
       if (err.response) {
         toast.error(err.response.data.detail);
       } else {
@@ -134,7 +141,7 @@ export default function HeroSection() {
               className="fixed top-1/2/2 -left-23 transform -translate-y-1/2 rotate-[-90deg]
       bg-white border border-gray-300 shadow-md px-15 py-2 rounded-lg text-md font-medium
       hover:bg-gray-100 transition z-50"
-              onClick={() => { setShowHistory(true); getAllHistory(); }}
+              onClick={() => { setShowHistory(true); getAllHistory(user_id); }}
             >
               View History
             </button>
@@ -170,7 +177,7 @@ export default function HeroSection() {
                       ))}
                     </>
                   ) : (
-                    "No Data Found"
+                    <NoDataFound/>
                   )
                 )}
               </div>

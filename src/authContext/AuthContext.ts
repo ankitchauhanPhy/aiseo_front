@@ -63,6 +63,8 @@ export interface AuthContextType {
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
   isComparison: boolean;
   setIsComparison: React.Dispatch<React.SetStateAction<boolean>>;
+  user_id:number;
+  setUser_id: React.Dispatch<React.SetStateAction<number>>;
 }
 
 // Just the context (no component here)

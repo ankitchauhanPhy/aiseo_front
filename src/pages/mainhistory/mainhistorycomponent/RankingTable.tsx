@@ -56,7 +56,7 @@ interface RankingTableProps {
   productVisible: boolean;
   productMatrices: (queryID: number, productName: string) => void;
   setProductVisible: (val: boolean) => void;
-  loading: boolean;
+  loadingRank: boolean;
   noData: boolean;
 }
 
@@ -118,9 +118,9 @@ function PlatformIcon({ type }: { type: "chatgpt" | "gemini" | "perplexity1" | "
   )
 }
 
-const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productVisible, productMatrices, setProductVisible, loading, noData, }) => {
+const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productVisible, productMatrices, setProductVisible, loadingRank, noData, }) => {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const [openDemo, setOpenDemo] = useState(false);
+  // const [openDemo, setOpenDemo] = useState(false);
   const [rankingPopup, setRankingPopup] = useState<boolean>(false);
   const [yourProduct, setYourProduct] = useState<any>(null);
 
@@ -131,10 +131,11 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
     isVisible, setIsVisible,
     isComparison, setIsComparison,
     setProductMatricesData,
+    user_id
   } = useAuth();
 
 
-  const dummyName: string = "Reebok Performer";
+  // const dummyName: string = "Reebok Performer";
   
 
   useEffect(() => {
@@ -204,6 +205,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                 <div className="flex flex-col">
                   {/* Checkboxes */}
                   <div className="flex flex-col gap-2 mt-1">
+                    { competitors.length > 0 && (
                     <label className="flex items-center gap-1 text-sm text-gray-700 font-semibold">
                       <input type="checkbox" className="accent-purple-600 mr-2"
                         checked={isVisible}
@@ -211,6 +213,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                       />
                       Visibility
                     </label>
+                    )}
                     {productVisible &&
                       <label className="flex items-center gap-1 text-sm text-gray-700 font-semibold">
                         <input type="checkbox" className="accent-purple-600 mr-2"
@@ -242,8 +245,8 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
 
             {/* Competitor Rows - scrollable */}
             <div className="divide-y divide-gray-200 overflow-y-auto flex-1">
-              {loading ? <Loader /> : (
-                competitors.length > 0 &&
+              {loadingRank ? <Loader /> : (
+                competitors.length > 0 ?
                 competitors.map((competitor, index) => (
                   <div
                     key={index}
@@ -349,6 +352,9 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                     </div>
                   </div>
                 ))
+                : (
+                  <NoDataFound/>
+                )
               )}
               {noData && <NoDataFound />}
             </div>

@@ -4,10 +4,10 @@ export default function NoDataFound() {
 
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Animated Container */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl  p-8 text-center border border-white/20 hover:shadow-3xl transition-all duration-500 hover:-translate-y-1">
+        <div className="  rounded-3xl  p-8 text-center border border-white/20 hover:shadow-3xl transition-all duration-500 hover:-translate-y-1">
           
           {/* Animated Icon Container */}
           <div className="relative mb-6">

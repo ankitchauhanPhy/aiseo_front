@@ -14,6 +14,7 @@ import { productMatrices } from "@/api/optimizationApi";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "@/component/loader/Loader";
+import NoDataFound from "@/component/noDataFound/NoDataFound";
 // import RankingPopup from "@/component/rankingPopUp/RankingPopup";
 
 
@@ -41,14 +42,15 @@ const MainHistory: React.FC = () => {
   const [chat, setChat] = useState<ChatItem[]>([]);
   const [singleConversationId, setSingleConversationId] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
- const  [noData, setNoData] = useState<boolean>(false);
+  const [loadingRank, setLoadingRank] = useState<boolean>(false);
+  const [noData, setNoData] = useState<boolean>(false);
 
   const nav = useNavigate();
   const location = useLocation();
 
   const { userId, conversationId } = location.state || {};
 
-  const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData, setIsVisible, setIsComparison } = useAuth();
+  const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData, setIsVisible, setIsComparison, user_id } = useAuth();
 
 
   async function singleHistory(userId: number, conversationId: number) {
@@ -86,10 +88,14 @@ const MainHistory: React.FC = () => {
     }
   }
 
-  async function getAllHistory() {
+  async function getAllHistory(user_id: number) {
+    if (user_id === 0) {
+      toast.warning("UserId not have");
+      return;
+    }
     setLoading(true);
     try {
-      const response = await HistoryAPI.getAllhistory(1);
+      const response = await HistoryAPI.getAllhistory(user_id);
       console.log("API Response:", response);
       if (response.statusText) {
         setLoading(false);
@@ -110,12 +116,16 @@ const MainHistory: React.FC = () => {
 
   useEffect(() => {
     if (userId && conversationId) {
+      console.log("useEffect userId conversationId mainhistory", userId, conversationId);
       singleHistory(userId, conversationId);
-      getAllHistory();
+      getAllHistory(userId);
     } else {
-      getAllHistory();
+      console.log("useEffect mainhistory getAllHistory", user_id);
+      if (user_id) {
+        getAllHistory(user_id);
+      }
     }
-  }, [])
+  }, [user_id])
 
   async function productMetrices(queryID: number, productName: string) {
     try {
@@ -141,15 +151,15 @@ const MainHistory: React.FC = () => {
     if (!queryID) return;
 
     const fetchPipeline = async () => {
-      setLoading(true);
+      setLoadingRank(true);
       try {
         const response = await OptimizationAPI.rankedQuery(queryID);
         console.log("API Response:", response);
 
         if (response.statusText) {
-          setLoading(false);
+          setLoadingRank(false);
           setOptimizationRank(response.data);
-          if(response.data.rankings.length === 0){
+          if (response.data.rankings.length === 0) {
             setNoData(true);
           }
           if (response.data.product_visible) {
@@ -157,7 +167,7 @@ const MainHistory: React.FC = () => {
           }
         }
       } catch (err: any) {
-        setLoading(false);
+        setLoadingRank(false);
         if (err.response) {
           toast.error(err.response.data.detail);
         } else {
@@ -196,21 +206,25 @@ const MainHistory: React.FC = () => {
                   {/* Chat messages */}
                   <div className="relative space-y-4 h-64 overflow-y-auto pr-2">
                     {loading ? <Loader /> : (
-                      chat.map((msg, index) => (
-                        <div
-                          key={index}
-                          className={`flex ${msg.id === "user" ? "justify-end" : "justify-start"}`}
-                        >
+                      chat.length > 0 ? (
+                        chat.map((msg, index) => (
                           <div
-                            className={`px-4 py-3 rounded-lg text-sm max-w-[80%] leading-relaxed ${msg.id === "user"
-                              ? "bg-gray-100 text-black" // user message style
-                              : "bg-[#7C3BED] text-white" // assistant message style
-                              }`}
+                            key={index}
+                            className={`flex ${msg.id === "user" ? "justify-end" : "justify-start"}`}
                           >
-                            {msg.title}
+                            <div
+                              className={`px-4 py-3 rounded-lg text-sm max-w-[80%] leading-relaxed ${msg.id === "user"
+                                ? "bg-gray-100 text-black" // user message style
+                                : "bg-[#7C3BED] text-white" // assistant message style
+                                }`}
+                            >
+                              {msg.title}
+                            </div>
                           </div>
-                        </div>
-                      ))
+                        ))
+                      ) : (
+                        <NoDataFound />
+                      )
                     )}
 
                   </div>
@@ -241,22 +255,31 @@ const MainHistory: React.FC = () => {
                   {/* Chats list scrollable */}
                   <div className=" relative divide-y divide-gray-200 flex-1 overflow-y-auto">
                     {loading ? <Loader /> : (
-                      (conversationData?.conversations && conversationData.conversations.length > 0) && conversationData.conversations.map((c, index) => (
+                      (conversationData?.conversations && conversationData.conversations.length > 0) ? (conversationData.conversations.map((c, index) => (
                         <div
                           key={index}
-                          className={`px-4 py-3 ${conversationId ? (c.conversation_id === conversationId ? "bg-gray-600 text-white" : "")
-                            : (singleConversationId === c.conversation_id) ? "bg-gray-600 text-white" : ""} hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
-                          onClick={() => { singleHistory(1, c.conversation_id); setIsVisible(false); setIsComparison(false) }}
+                          className={`px-4 py-3  ${singleConversationId === 0
+                              ? conversationId && c.conversation_id === conversationId
+                                ? "bg-gray-600 text-white"
+                                : ""
+                              : singleConversationId === c.conversation_id
+                                ? "bg-gray-600 text-white"
+                                : ""
+                            } hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
+                          onClick={() => { singleHistory(user_id, c.conversation_id); setIsVisible(false); setIsComparison(false) }}
                         >
                           <p className="text-sm font-medium">{c.last_user_query}</p>
                         </div>
-                      ))
+                      ))) : (
+                        <NoDataFound />
+                      )
                     )}
-
                   </div>
 
                   {/* Footer stays at bottom */}
-                  <button className="w-full py-3 text-center text-sm font-medium text-white bg-gray-800 hover:bg-[#7C3BED] rounded-b-2xl transition">
+                  <button className={`w-full py-3 text-center text-sm font-medium rounded-b-2xl transition 
+                    ${!user_id || conversationData?.conversations.length === 0 ? "cursor-not-allowed text-white bg-gray-800 " : "text-white bg-gray-800 hover:bg-[#7C3BED] "}
+                  `}>
                     View More
                   </button>
                 </div>
@@ -283,21 +306,21 @@ const MainHistory: React.FC = () => {
 
             {/* Right Column (Rankings) */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-[100%] flex flex-col w-full lg:w-[40%] xl:w-[50%] ">
-              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible} 
-              loading={loading} noData={noData} 
+              <RankingsTable optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMetrices} setProductVisible={setProductVisible}
+                loadingRank={loadingRank} noData={noData}
               />
             </div>
           </div>
         </div>
       ) : (
-        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMatrices} setProductVisible={setProductVisible} 
+        <ComparisonView optimizationRank={optimizationRank} productVisible={productVisible} productMatrices={productMatrices} setProductVisible={setProductVisible}
         />
       )}
       {openVisibility && (
         <ExampleVisibilityDetails openVisibility={openVisibility} setOpenVisibility={setOpenVisibility} visibilityData={visibilityData} />
       )}
 
-      
+
 
     </>
   );
