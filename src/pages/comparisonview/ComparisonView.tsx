@@ -107,8 +107,8 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   setVisibilityData,
 }) => {
   const { isLoading, error, isDataReady } = useProductMatrices();
-  const { competitorProductVisible,setCompetitorProductVisible } = useAuth();
-  
+  const { competitorProductVisible, setCompetitorProductVisible, yourProductName, competitorProductName } = useAuth();
+
   setCompetitorProductVisible(true);
   if (isLoading) {
     return (
@@ -144,6 +144,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     <div className="h-[calc(100vh-75px)] text-black flex flex-col lg:flex-row px-4 py-2">
       {/* 1st column */}
       <div className="w-full lg:w-1/3 flex flex-row lg:flex-col gap-2 p-2">
+        <h2 className="text-center text-lg font-semibold text-gray-900  border-1 rounded-xl">
+          {yourProductName}
+        </h2>
         <VisibilityChart
           setOpenVisibility={setOpenVisibility}
           setVisibilityData={setVisibilityData}
@@ -153,6 +156,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 
       {/* 2nd Column */}
       <div className="w-full lg:w-2/3 p-2">
+      {/* <h2 className="text-center text-xl font-semibold text-gray-900 mb-2">
+          {yourProductName}
+        </h2> */}
         <RankingTable
           optimizationRank={optimizationRank}
           productVisible={productVisible}
@@ -163,6 +169,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 
       {/* 3rd Column */}
       <div className="w-full lg:w-1/3 flex flex-row lg:flex-col gap-2 p-2">
+      <h2 className="text-center text-lg font-semibold text-gray-900 border-1 rounded-xl">
+          {competitorProductName}
+        </h2>
         <VisibilityChartUpdated
           setOpenVisibility={setOpenVisibility}
           setVisibilityData={setVisibilityData}

@@ -323,7 +323,7 @@ export default function MentionBar() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-semibold text-gray-900">Mentions</h2>
+          <h2 className="text-2xl font-semibold text-gray-900">Competitor Mentions</h2>
           {isLoading && (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
           )}
@@ -346,11 +346,11 @@ export default function MentionBar() {
       </div>
 
       {/* Status indicator */}
-      {lastUpdated && (
+      {/* {lastUpdated && (
         <div className="mb-2 text-xs text-gray-400">
           Last updated: {lastUpdated.toLocaleTimeString()}
         </div>
-      )}
+      )} */}
 
       {/* Error banner (if error but we have cached data) */}
       {error && totalMentions > 0 && (

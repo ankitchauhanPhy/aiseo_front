@@ -13,7 +13,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [conversationData, setConversationData] = useState<ConversationsResponse | null>(null);
 
   const [yourProductName, setYourProductName] = useState<string>("");
-  const [competitorProductName, setCompetitorProductName] = useState<any>("");
+  const [competitorProductName, setCompetitorProductName] = useState<string>("");
   const [competitorProductVisible, setCompetitorProductVisible] = useState<boolean>(false);
   const [freeTrialPopup, setFreeTrialPopup] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
