@@ -363,7 +363,7 @@ const ChatHistory: React.FC = () => {
       ></div>
 
       {/* Sidebar */}
-      <div className="ml-5 border-2 border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden ">
+      <div className="ml-5 border-2 border-gray-300 rounded-lg w-80 flex flex-col p-2 md:h-full h-[60%] md:overflow-hidden history-sidebar">
         {/* Header */}
         <div className="p-4 border-b-2 border-gray-300 flex-shrink-0">
           <div className="flex items-center gap-2 text-black-400 text-sm ">

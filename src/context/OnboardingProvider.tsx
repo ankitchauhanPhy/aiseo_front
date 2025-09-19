@@ -141,7 +141,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         showProgress
         disableOverlayClose
         spotlightClicks
-        disableBeacon={true}
+        // beaconComponent
         styles={joyrideStyles}
         callback={(data) => {
           // Stop tour automatically if finished
