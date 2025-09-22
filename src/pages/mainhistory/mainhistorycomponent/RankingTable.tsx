@@ -172,6 +172,8 @@ const RankingsTable: React.FC<RankingTableProps> = ({
     }
   }, [optimizationRank]);
 
+  console.log("noData", noData);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full flex flex-col">
       <div className="overflow-auto flex-1">
@@ -341,11 +343,6 @@ const RankingsTable: React.FC<RankingTableProps> = ({
                 </tr>
               ))
             ) : (
-              <tr>
-                <td colSpan={5} className="text-center py-6"><NoDataFound /></td>
-              </tr>
-            )}
-            {noData && (
               <tr>
                 <td colSpan={5} className="text-center py-6"><NoDataFound /></td>
               </tr>

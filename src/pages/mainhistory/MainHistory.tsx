@@ -18,6 +18,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "@/component/loader/Loader";
 import NoDataFound from "@/component/noDataFound/NoDataFound";
+import ChatMessage from "@/component/ChatMessage";
 // import RankingPopup from "@/component/rankingPopUp/RankingPopup";
 
 
@@ -125,6 +126,7 @@ const MainHistory: React.FC = () => {
       return () => clearTimeout(timer); // cleanup
     }
   }, []);
+  
   async function singleHistory(userId: number, conversationId: number) {
     try {
       setLoading(true);
@@ -159,6 +161,8 @@ const MainHistory: React.FC = () => {
 
     }
   }
+
+
 
   async function getAllHistory(user_id: number) {
     if (user_id === 0) {
@@ -290,7 +294,14 @@ const MainHistory: React.FC = () => {
                                 : "bg-[#7C3BED] text-white" // assistant message style
                                 }`}
                             >
-                              {msg.title}
+                              {
+                                msg.id === "user" ? (
+                                  <div>{msg.title}</div>
+                                ) : (
+                                  <ChatMessage text={msg.title} />
+                                )
+                              }
+
                             </div>
                           </div>
                         ))
@@ -330,12 +341,12 @@ const MainHistory: React.FC = () => {
                         <div
                           key={index}
                           className={`px-4 py-3  ${singleConversationId === 0
-                              ? conversationId && c.conversation_id === conversationId
-                                ? "bg-gray-600 text-white"
-                                : ""
-                              : singleConversationId === c.conversation_id
-                                ? "bg-gray-600 text-white"
-                                : ""
+                            ? conversationId && c.conversation_id === conversationId
+                              ? "bg-gray-600 text-white"
+                              : ""
+                            : singleConversationId === c.conversation_id
+                              ? "bg-gray-600 text-white"
+                              : ""
                             } hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
                           onClick={() => { singleHistory(user_id, c.conversation_id); setIsVisible(false); setIsComparison(false) }}
                         >
