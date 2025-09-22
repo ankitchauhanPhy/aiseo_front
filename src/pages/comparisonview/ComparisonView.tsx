@@ -80,7 +80,7 @@
 
 // export default ComparisonView;
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import VisibilityChart from "./comparisoncomponent/VisibilityChart";
 import VisibilityChartUpdated from "./comparisoncomponent/VisibilityChartUpdated";
 import RankingTable from "./comparisoncomponent/RankingTable";
@@ -113,7 +113,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     const [visibilityDataCompetitor, setVisibilityDataCompetitor] = useState("");
 
 
-  setCompetitorProductVisible(true);
+   useEffect(() => {
+    setCompetitorProductVisible(true);
+  }, [setCompetitorProductVisible]);
   if (isLoading) {
     return (
       <div className="h-[calc(100vh-75px)] flex items-center justify-center">

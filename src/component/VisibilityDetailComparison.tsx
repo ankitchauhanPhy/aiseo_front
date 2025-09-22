@@ -120,7 +120,7 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
               <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 {citationsFound} citations found
               </h3>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-sm max-h-40 overflow-y-auto w-full">
                 {citationUrls && citationUrls.map((url, i) => (
                   <a
                     key={i}
