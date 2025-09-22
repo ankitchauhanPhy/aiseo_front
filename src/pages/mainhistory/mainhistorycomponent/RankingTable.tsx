@@ -344,7 +344,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-6"><NoDataFound /></td>
+                <td colSpan={6} className="text-center py-6"><NoDataFound /></td>
               </tr>
             )}
           </tbody>
