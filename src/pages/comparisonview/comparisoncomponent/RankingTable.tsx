@@ -379,7 +379,6 @@ const RankingTable: React.FC<RankingTableProps> = ({
           </div>
         </div>
       </div>
-      {/* <Rankings open={openDemo} onOpenChange={setOpenDemo} competitor={""} /> */}
     </>
   );
 };

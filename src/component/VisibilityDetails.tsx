@@ -166,13 +166,10 @@ const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
 }) => {
   const {
     productMatricesData,
-    competitorProductVisible,
-    productMatricesCompetitor,
-    setProductMatricesCompetitor
   } = useAuth();
 
   console.log("productMetricesData in visibility", productMatricesData);
-  console.log("productMetricesData Competitor", productMatricesCompetitor);
+ 
   let mockIcon;
   let count;
   if (visibilityData === "Perplexity") {
@@ -188,11 +185,8 @@ const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
 
   const platformKey = visibilityData.toLowerCase();
   const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
-console.log("202=======",productMatricesCompetitor,competitorProductVisible)
-  // const citationUrls =
-  //   (competitorProductVisible
-  //     ? productMatricesCompetitor
-  //     : productMatricesData)[0]?.citations?.[platformKey] ?? [];
+//console.log("202=======",productMatricesCompetitor,competitorProductVisible)
+
 
   const sampleData = {
     title: visibilityData,
