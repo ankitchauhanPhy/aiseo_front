@@ -86,7 +86,7 @@ function formatRank(rank: number): JSX.Element {
             ? "rd"
             : "th";
   return (
-    <span>
+    <span className="inline-block w-8 text-right">
       {rank}
       <sup className="text-xs">{suffix}</sup>
     </span>

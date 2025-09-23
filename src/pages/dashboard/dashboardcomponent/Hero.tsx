@@ -41,15 +41,16 @@ export default function HeroSection() {
   } = useAuth();
 
   const nav = useNavigate();
-console.log("user_id", user_id);
+  console.log("user_id", user_id);
+  
   async function getAllHistory(user_id: number) {
-     if(!user_id){
-          toast.warning("UserId not have");
-          return;
-        }
+    if (!user_id) {
+      toast.warning("UserId not have");
+      return;
+    }
     setLoading(true);
     try {
-      const response = await HistoryAPI.getAllhistory(user_id);
+      const response = await HistoryAPI.getAllhistory(user_id, 1, 10);
       console.log("API Response:", response);
       if (response.statusText) {
         setConversationData(response.data);
@@ -161,7 +162,7 @@ console.log("user_id", user_id);
               {/* Scrollable Content */}
               <div className="p-4 space-y-3 overflow-y-auto h-[calc(100%-56px)]">
                 {loading ? (<Loader />) : (
-                   conversationData?.conversations && conversationData?.conversations.length > 0 ? (
+                  conversationData?.conversations && conversationData?.conversations.length > 0 ? (
                     <>
                       {conversationData.conversations.map((c) => (
                         <div
@@ -178,7 +179,7 @@ console.log("user_id", user_id);
                       ))}
                     </>
                   ) : (
-                    <NoDataFound/>
+                    <NoDataFound />
                   )
                 )}
               </div>

@@ -1,10 +1,12 @@
 import axiosClient from "./axiosClient";
 
 
-export const getAllhistory = async (userId: number) => {
+export const getAllhistory = async (userId: number, page:number, limit:number) => {
     const response = await axiosClient.get(`/conversations/all`, {
         params: {
-            user_id: userId
+            user_id: userId,
+            page: page,
+            limit: limit,
         }
     });
     return response;

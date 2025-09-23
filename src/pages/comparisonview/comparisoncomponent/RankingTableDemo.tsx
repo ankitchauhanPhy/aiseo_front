@@ -77,10 +77,27 @@ function getRankingColor(rank: number): string {
   }
 }
 
-function formatRank(rank: number): string {
+
+function formatRank(rank: number): JSX.Element {
+  const lastDigit = rank % 10;
+  const lastTwoDigits = rank % 100;
+
   const suffix =
-    rank === 1 ? "st" : rank === 2 ? "nd" : rank === 3 ? "rd" : "th";
-  return `${rank}${suffix}`;
+    lastTwoDigits === 11 || lastTwoDigits === 12 || lastTwoDigits === 13
+      ? "th"
+      : lastDigit === 1
+        ? "st"
+        : lastDigit === 2
+          ? "nd"
+          : lastDigit === 3
+            ? "rd"
+            : "th";
+  return (
+    <span className="inline-block w-8 text-right">
+      {rank}
+      <sup className="text-xs">{suffix}</sup>
+    </span>
+  );
 }
 
 function getTrophyIcon(rank: number) {
@@ -271,6 +288,7 @@ const RankingTableDemo: React.FC<RankingTableProps> = ({
                     {/* Rank */}
                     <td className="px-4 py-2  text-md flex flex-row items-center" colSpan={2}>
                       <span>
+                        
                         {formatRank(competitor.overallRank)}
                       </span>
                       <span>
