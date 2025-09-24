@@ -7,7 +7,6 @@ import { useAuth } from '@/authContext/useAuth';
 import { ChatTextAPI, HistoryAPI } from '@/api';
 import ChatMessage from '@/component/ChatMessage';
 import { useOnboarding } from '@/context/OnboardingProvider';
-// import ExpandableInput from '@/component/ExpandableInput';
 
 import { toast } from "react-toastify";
 import Loader from '@/component/loader/Loader';
@@ -27,16 +26,12 @@ interface StepProcess {
   completed: boolean;
   active: boolean;
 }
-// interface ApiConversation {
-//   role: "user" | "assistant";
-//   message: string;
-// }
 
 const ChatHistory: React.FC = () => {
 
   // Joyride states
   const { startTour } = useOnboarding();
-  // const [run, setRun] = useState(true);
+
 
   const steps: Step[] = [
     {
@@ -67,6 +62,11 @@ const ChatHistory: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const [historyLoading, setHistoryLoading] = useState<boolean>(false);
   const [callAPI, setCallAPI] = useState<boolean>(false);
+
+  //Pagination State
+  const [page, setPage] = useState(1); 
+  const [hasMore, setHasMore] = useState(true);
+
   const nav = useNavigate();
 
   const { firstChatText, setFirstChatText, queryID, setQueryID, conversationData, setConversationData, setComparisonView, setIsComparison, setIsVisible, user_id } = useAuth();
@@ -82,70 +82,63 @@ const ChatHistory: React.FC = () => {
     { id: 6, text: 'Done', completed: false, active: false },
   ]);
 
-  // async function singleHistory(userId: number, conversationID: number) {
-  //   try {
 
-  //     const response = await HistoryAPI.getSinglehistory(userId, conversationID);
-  //     console.log("API Response:", response);
-  //     if (response.statusText) {
-  //       if (response?.data.conversation && Array.isArray(response.data.conversation)) {
-
-  //         // ✅ Remove last 3
-  //         const withoutLastThree = response.data.conversation.slice(0, -3);
-
-  //         // Transform API conversation → ChatItem[]
-  //         const formattedChat: ChatItem[] = withoutLastThree.map((c: ApiConversation) => ({
-  //           id: c.role,            // "user" | "assistant"
-  //           title: c.message,      // message text
-  //           loading: false         // always false here
-  //         }));
-
-  //         setChat(formattedChat);
-  //       }
-  //     }
-  //   } catch (err: Error | unknown) {
-  //     console.error("API Error:", err);
-  //     const message = err instanceof Error ? err.message : "Something went wrong!";
-  //     console.log("Error in Single history", message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-
-  async function getAllHistory(user_id: number) {
+  // ===================== API CALL WITH PAGINATION =====================
+  async function getAllHistory(user_id: number, pageNumber: number = 1) {
     if (!user_id) {
-      toast.warning("UserId not have");
+      toast.warning("UserId not found");
       return;
     }
     setHistoryLoading(true);
     try {
-      const response = await HistoryAPI.getAllhistory(user_id);
+      const response = await HistoryAPI.getAllhistory(user_id, pageNumber, 10); 
       console.log("API Response:", response);
+
       if (response.statusText) {
-        setConversationData(response.data);
-        setHistoryLoading(false);
+        const newConversations = response.data?.conversations || [];
+
+        if (pageNumber === 1) {
+          setConversationData({ user_id, conversations: newConversations });
+        } else {
+          setConversationData((prev) => {
+            if (!prev) return { user_id, conversations: newConversations };
+            return {
+              user_id: prev.user_id,
+              conversations: [...prev.conversations, ...newConversations],
+            };
+          });
+        }
+
+        // Check if we received less than limit → no more pages
+        if (newConversations.length < 10) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+        }
       }
     } catch (err: any) {
-      setHistoryLoading(false);
       if (err.response) {
+        setHasMore(false);
         toast.error(err.response.data.detail);
-      } else {
-        toast.error(err.message);
       }
-      console.error("API Error:", err);
-      const message = err instanceof Error ? err.message : "Something went wrong!";
-      console.log("Error", message);
+      else toast.error(err.message);
+      console.error(err);
+    } finally {
+      setHistoryLoading(false);
     }
   }
 
+  // ===================== INITIAL LOAD =====================
   useEffect(() => {
     if (user_id) {
       setComparisonView(false);
       setIsComparison(false);
       setIsVisible(false);
-      getAllHistory(user_id);
+      setPage(1);
+      setHasMore(true);
+      getAllHistory(user_id, 1);
     }
-  }, [user_id])
+  }, [user_id]);
 
   useEffect(() => {
     if (!localStorage.getItem("chatMainHistoryTourDone")) {
@@ -159,11 +152,20 @@ const ChatHistory: React.FC = () => {
   }, []);
 
 
-  const handleSelectHistory = (userId: number, conversationId: number) => {
-    console.log("conversationId chathistory handleselecet", userId, conversationId);
+  const handleSelectHistory = (userId: number, conversationId: number, page: number) => {
+    console.log("conversationId chathistory handleselecet", userId, conversationId, page);
     nav("/optimization", {
-      state: { userId: userId, conversationId: conversationId }
+      state: { userId: userId, conversationId: conversationId, pageNumberChat: page }
     })
+  
+  };
+
+  // ===================== LOAD MORE =====================
+  const handleLoadMore = () => {
+    if (historyLoading) return; // Prevent multiple calls
+    const nextPage = page + 1;
+    setPage(nextPage);
+    getAllHistory(user_id, nextPage);
   };
 
   // Polling for query status when process step starts
@@ -381,28 +383,43 @@ const ChatHistory: React.FC = () => {
         </div>
 
         {/* Chat History List */}
-        {/* Scrollable Conversation History */}
         <div className="overflow-y-auto h-[calc(100%-56px)]">
-          {historyLoading ? <Loader /> : (
-            conversationData?.conversations && conversationData.conversations.length > 0 ? (
-              conversationData.conversations.map((c) => (
+          {historyLoading && page === 1 ? (
+            <Loader />
+          ) : conversationData?.conversations && conversationData.conversations.length > 0 ? (
+            <>
+              {conversationData.conversations.map((c) => (
                 <div
                   key={c.conversation_id}
-                  className={`p-4 hover:bg-gray-300  rounded-lg cursor-pointer`}
-                  // onClick={() => { singleHistory(1, c.conversation_id); setSelectedHistory(true); setSelectedConversationId(c.conversation_id) }}
-                  onClick={() => { handleSelectHistory(user_id, c.conversation_id); setTitle(c.last_user_query) }}
+                  className="p-4 hover:bg-gray-300 rounded-lg cursor-pointer"
+                  onClick={() => { handleSelectHistory(user_id, c.conversation_id, page); setTitle(c.last_user_query) }}
                 >
-                  <h3 className="text-black  text-sm font-medium  mb-1">
+                  <h3 className="text-black text-sm font-medium mb-1">
                     {c.last_user_query}
                   </h3>
                 </div>
-              ))
-            ) : (
-              // <p className="text-gray-400 text-sm text-center py-4">No Data Found</p>
-              <NoDataFound />
-            )
-          )}
+              ))}
 
+              {/* View More Button */}
+              {hasMore && (
+                <div className="flex justify-center mt-2">
+                  <button
+                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition w-full"
+                    onClick={handleLoadMore}
+                    disabled={historyLoading}
+                  >
+                    {historyLoading ? "Loading..." : "View More"}
+                  </button>
+                </div>
+              )}
+
+              {!hasMore && (
+                <p className="text-center text-gray-500 text-sm mt-2">No more history</p>
+              )}
+            </>
+          ) : (
+            <NoDataFound />
+          )}
         </div>
       </div>
 

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-// import VisibilityChart from "./mainhistorycomponent/VisibilityChart";
+import React, { useCallback, useEffect, useState } from "react";
 import RankingsTable from "./mainhistorycomponent/RankingTable";
 import MentionsBar from "./mainhistorycomponent/MentionBar";
 import LightBulb from "../../assets/mainHistory/LightBulb.png";
@@ -19,7 +18,7 @@ import { toast } from "react-toastify";
 import Loader from "@/component/loader/Loader";
 import NoDataFound from "@/component/noDataFound/NoDataFound";
 import ChatMessage from "@/component/ChatMessage";
-// import RankingPopup from "@/component/rankingPopUp/RankingPopup";
+
 
 
 interface ChatItem {
@@ -43,7 +42,6 @@ const MainHistory: React.FC = () => {
     rankings: []
   })
   const [productVisible, setProductVisible] = useState(false);
-  // const { comparisonView, queryID, setProductMatricesData } = useAuth();
   const { startTour } = useOnboarding();
   const [chat, setChat] = useState<ChatItem[]>([]);
   const [singleConversationId, setSingleConversationId] = useState<number>(0);
@@ -51,11 +49,15 @@ const MainHistory: React.FC = () => {
   const [loadingRank, setLoadingRank] = useState<boolean>(false);
   const [noData, setNoData] = useState<boolean>(false);
 
+  // NEW STATES for pagination
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   const nav = useNavigate();
   const location = useLocation();
 
-  const { userId, conversationId } = location.state || {};
-
+  const { userId, conversationId, pageNumberChat } = location.state || {};
+  console.log("pageNumberChat", pageNumberChat, "userId", userId, "conversationId", conversationId,"page", page);
   const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData, setIsVisible, setIsComparison, user_id } = useAuth();
 
   // Joyride steps configuration
@@ -102,13 +104,6 @@ const MainHistory: React.FC = () => {
         "Select visibility or comparison to show metrics and compare metrics.",
       placement: "bottom" as const,
     },
-
-    // {
-    //   target: '[data-tour="ranking-row-2"]', 
-    //   content:
-    //     "Clicking the second product will take you to the Comparison Stats page.",
-    //   placement: "right",
-    // },
     {
       target: '[data-tour="rankings-table"]', // or 'body' for center overlay
       content: 'Welcome! Click on a product to see its details or compare it. Happy Searching',
@@ -126,7 +121,10 @@ const MainHistory: React.FC = () => {
       return () => clearTimeout(timer); // cleanup
     }
   }, []);
-  
+
+
+
+  // ================= SINGLE HISTORY =================
   async function singleHistory(userId: number, conversationId: number) {
     try {
       setLoading(true);
@@ -138,7 +136,10 @@ const MainHistory: React.FC = () => {
         if (response?.data.conversation && Array.isArray(response.data.conversation)) {
 
           // ✅ Remove last 3
-          const withoutLastThree = response.data.conversation.slice(0, -3);
+          // const withoutLastThree = response.data.conversation.slice(0, -3);
+          const conversationArr = response.data.conversation || [];
+          const withoutLastThree =
+            conversationArr.length > 3 ? conversationArr.slice(0, -3) : conversationArr;
 
           // Transform API conversation → ChatItem[]
           const formattedChat: ChatItem[] = withoutLastThree.map((c: ApiConversation) => ({
@@ -163,46 +164,105 @@ const MainHistory: React.FC = () => {
   }
 
 
+  // ================= ALL HISTORY WITH PAGINATION =================
+  const getAllHistory = useCallback(
+    async (user_id: number, pageNumber: number = 1) => {
+      if (user_id === 0) {
+        toast.warning("UserId not available");
+        return;
+      }
+      setLoading(true);
+      try {
+        console.log("getAllHistory pagenumber173", pageNumber);
+        const response = await HistoryAPI.getAllhistory(user_id, pageNumber, 10);
+        if (response.statusText) {
+          setLoading(false);
 
-  async function getAllHistory(user_id: number) {
-    if (user_id === 0) {
-      toast.warning("UserId not have");
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await HistoryAPI.getAllhistory(user_id);
-      console.log("API Response:", response);
-      if (response.statusText) {
-        setLoading(false);
-        setConversationData(response.data);
-        if (!userId && !conversationId) {
-          singleHistory(user_id, response.data.conversations[0]?.conversation_id);
+          const newConversations = response.data?.conversations || [];
+          console.log("newConversations", newConversations, "conversationData", conversationData, "pagweNumber", pageNumber);
+
+          if (pageNumber === 1 && !conversationData) {
+            setConversationData(response.data);
+          } else {
+            console.log(" else newConversations", newConversations, "conversationData", conversationData, "pagweNumber", pageNumber);
+            setConversationData((prev) => {
+
+              if (!prev) return response.data;
+
+              console.log("prev189", prev, "pageNumber", page);
+              // ✅ prevent duplicates
+              const existingIds = new Set(
+                prev.conversations.map((c) => c.conversation_id)
+              );
+
+              console.log("191 existingIds", existingIds);
+              const filteredNew = newConversations.filter(
+
+                (c: any) => {
+                  console.log("newFiltered193", c);
+                  return !existingIds.has(c.conversation_id)
+                }
+              );
+
+              console.log("filteredNew 194", filteredNew);
+
+              return {
+                user_id: prev.user_id,
+                conversations: [...prev.conversations, ...filteredNew],
+              };
+            });
+          }
+
+          if (newConversations.length < 10) {
+            setHasMore(false);
+          }
+
+          if (!userId && !conversationId && pageNumber === 1) {
+            singleHistory(user_id, response.data.conversations[0]?.conversation_id);
+          }
         }
+      } catch (err: any) {
+        setLoading(false);
+        toast.error(err.response?.data?.detail || err.message);
       }
-    } catch (err: any) {
-      setLoading(false);
-      if (err.response) {
-        toast.error(err.response.data.detail);
-      } else {
-        toast.error(err.message);
-      }
-    }
-  }
+    },
+    [conversationId, userId] // ✅ only re-creates when these change
+  );
 
+  // ====================Load data on mount================
   useEffect(() => {
+    if (!user_id) return;
     if (userId && conversationId) {
-      console.log("useEffect userId conversationId mainhistory", userId, conversationId);
       singleHistory(userId, conversationId);
-      getAllHistory(userId);
-    } else {
-      console.log("useEffect mainhistory getAllHistory", user_id);
-      if (user_id) {
-        getAllHistory(user_id);
-      }
+      const fetchAll = async () => {
+        for (let d = 1; d <= (pageNumberChat); d++) {
+          await getAllHistory(userId, d);
+        }
+      };
+      fetchAll();
+    } else if (user_id) {
+      console.log("user_id 226", user_id);
+      getAllHistory(user_id, 1);
     }
-  }, [user_id])
+  }, [userId, conversationId, user_id, pageNumberChat]);
 
+
+  // ================= LOAD MORE =================
+  const handleLoadMore = () => {
+    if (loading) return;
+    let nextPage = 0;
+    if (pageNumberChat > page) {
+      nextPage = pageNumberChat + 1;
+    }
+    else {
+      nextPage = page + 1;
+    }
+    setPage(nextPage);
+    getAllHistory(user_id, nextPage);
+  };
+
+
+  // ================= PRODUCT METRICS =================
   async function productMetrices(queryID: number, productName: string) {
     try {
       const response = await OptimizationAPI.productMatrices(queryID, productName);
@@ -223,9 +283,10 @@ const MainHistory: React.FC = () => {
     }
   }
 
+
+  // ================= RANKED QUERY =================
   useEffect(() => {
     if (!queryID) return;
-
     const fetchPipeline = async () => {
       setLoadingRank(true);
       try {
@@ -334,37 +395,68 @@ const MainHistory: React.FC = () => {
                     </h2>
                   </div>
 
-                  {/* Chats list scrollable */}
-                  <div className=" relative divide-y divide-gray-200 flex-1 overflow-y-auto">
-                    {loading ? <Loader /> : (
-                      (conversationData?.conversations && conversationData.conversations.length > 0) ? (conversationData.conversations.map((c, index) => (
-                        <div
-                          key={index}
-                          className={`px-4 py-3  ${singleConversationId === 0
-                            ? conversationId && c.conversation_id === conversationId
-                              ? "bg-gray-600 text-white"
-                              : ""
-                            : singleConversationId === c.conversation_id
-                              ? "bg-gray-600 text-white"
-                              : ""
-                            } hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
-                          onClick={() => { singleHistory(user_id, c.conversation_id); setIsVisible(false); setIsComparison(false) }}
-                        >
-                          <p className="text-sm font-medium">{c.last_user_query}</p>
-                        </div>
-                      ))) : (
-                        <NoDataFound />
-                      )
+
+                  <div className="relative divide-y divide-gray-200 flex-1 overflow-y-auto">
+                    {loading && page === 1 ? <Loader /> : (
+                      conversationData && conversationData?.conversations?.length > 0 ? (
+                        <>
+                          {conversationData.conversations.map((c, index) => (
+                            <div
+                              key={index}
+                              className={`px-4 py-3 ${singleConversationId === 0
+                                ? conversationId && c.conversation_id === conversationId
+                                  ? "bg-gray-600 text-white"
+                                  : ""
+                                : singleConversationId === c.conversation_id
+                                  ? "bg-gray-600 text-white"
+                                  : ""
+                                } hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
+                              onClick={() => {
+                                //singleHistory(user_id, c.conversation_id); 
+                                setIsVisible(false); setIsComparison(false)
+                                nav(location.pathname, {
+                                  replace: true,
+                                  state: {
+                                    ...location.state,
+                                    pageNumberChat: page,
+                                    conversationId: c.conversation_id,
+                                    userId: conversationData.user_id,
+                                  },
+                                });
+                              }}
+                            >
+                              <p className="text-sm font-medium">{c.last_user_query}</p>
+                            </div>
+                          ))}
+
+                          {/* View More Button */}
+                          {hasMore && (
+                            <div className="flex justify-center mt-3">
+                              <button
+                                onClick={handleLoadMore}
+                                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition w-full"
+                                disabled={loading}
+                              >
+                                {loading ? "Loading..." : "View More"}
+                              </button>
+                            </div>
+                          )}
+                          {!hasMore && (
+                            <p className="text-center text-gray-500 text-sm mt-2">No more history</p>
+                          )}
+                        </>
+                      ) : <NoDataFound />
                     )}
                   </div>
+                </div>
 
-                  {/* Footer stays at bottom */}
-                  <button className={`w-full py-3 text-center text-sm font-medium rounded-b-2xl transition 
+                {/* Footer stays at bottom */}
+                {/* <button className={`w-full py-3 text-center text-sm font-medium rounded-b-2xl transition 
                     ${!user_id || conversationData?.conversations.length === 0 ? "cursor-not-allowed text-white bg-gray-800 " : "text-white bg-gray-800 hover:bg-[#7C3BED] "}
                   `}>
                     View More
-                  </button>
-                </div>
+                  </button> */}
+
               </div>
             </div>
 
