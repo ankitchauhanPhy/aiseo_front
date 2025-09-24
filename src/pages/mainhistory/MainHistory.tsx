@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import RankingsTable from "./mainhistorycomponent/RankingTable";
 import MentionsBar from "./mainhistorycomponent/MentionBar";
 import LightBulb from "../../assets/mainHistory/LightBulb.png";
@@ -48,16 +48,19 @@ const MainHistory: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingRank, setLoadingRank] = useState<boolean>(false);
   const [noData, setNoData] = useState<boolean>(false);
+  const [autoScroll, setAutoScroll] = useState<boolean>(false);
+  // const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   // NEW STATES for pagination
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+
   const nav = useNavigate();
   const location = useLocation();
 
   const { userId, conversationId, pageNumberChat } = location.state || {};
-  console.log("pageNumberChat", pageNumberChat, "userId", userId, "conversationId", conversationId,"page", page);
+  console.log("pageNumberChat", pageNumberChat, "userId", userId, "conversationId", conversationId, "page", page);
   const { comparisonView, queryID, setQueryID, setProductMatricesData, conversationData, setConversationData, setIsVisible, setIsComparison, user_id } = useAuth();
 
   // Joyride steps configuration
@@ -180,7 +183,7 @@ const MainHistory: React.FC = () => {
 
           const newConversations = response.data?.conversations || [];
           console.log("newConversations", newConversations, "conversationData", conversationData, "pagweNumber", pageNumber);
-          if(pageNumber === 1 && conversationData){
+          if (pageNumber === 1 && conversationData) {
             setConversationData(response.data);
           }
           else if (pageNumber === 1 && !conversationData) {
@@ -231,6 +234,13 @@ const MainHistory: React.FC = () => {
     [conversationId, userId] // ✅ only re-creates when these change
   );
 
+  //============ChatEndRef========
+  //   useEffect(() => {
+  //   if (chatEndRef.current) {
+  //     chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [chat]);
+
   // ====================Load data on mount================
   useEffect(() => {
     if (!user_id) return;
@@ -251,6 +261,7 @@ const MainHistory: React.FC = () => {
 
   // ================= LOAD MORE =================
   const handleLoadMore = () => {
+    setAutoScroll(true);
     if (loading) return;
     let nextPage = 0;
     if (pageNumberChat > page) {
@@ -344,11 +355,21 @@ const MainHistory: React.FC = () => {
 
                   {/* Chat messages */}
                   <div className="relative space-y-4 h-64 overflow-y-auto pr-2">
-                    {loading ? <Loader /> : (
-                      chat.length > 0 ? (
-                        chat.map((msg, index) => (
+                    {loading ? (
+                      <Loader />
+                    ) : chat.length > 0 ? (
+                      <>
+                        {chat.map((msg, index) => (
                           <div
                             key={index}
+                            ref={(el) => {
+                              if(el){
+                              el.scrollIntoView({
+                                behavior: "smooth",
+                                block: "nearest",
+                              });
+                            }
+                            }}
                             className={`flex ${msg.id === "user" ? "justify-end" : "justify-start"}`}
                           >
                             <div
@@ -357,23 +378,18 @@ const MainHistory: React.FC = () => {
                                 : "bg-[#7C3BED] text-white" // assistant message style
                                 }`}
                             >
-                              {
-                                msg.id === "user" ? (
-                                  <div>{msg.title}</div>
-                                ) : (
-                                  <ChatMessage text={msg.title} />
-                                )
-                              }
-
+                              {msg.id === "user" ? <div>{msg.title}</div> : <ChatMessage text={msg.title} />}
                             </div>
                           </div>
-                        ))
-                      ) : (
-                        <NoDataFound />
-                      )
+                        ))}
+                        {/* Invisible div to scroll into view */}
+                        {/* <div ref={chatEndRef} /> */}
+                      </>
+                    ) : (
+                      <NoDataFound />
                     )}
-
                   </div>
+
 
                   <div className="flex flex-row gap-3 mt-5">
                     <img
@@ -399,37 +415,66 @@ const MainHistory: React.FC = () => {
 
 
                   <div className="relative divide-y divide-gray-200 flex-1 overflow-y-auto">
-                    {loading && page === 1 ? <Loader /> : (
+                    {loading && page === 1 ? (
+                      <Loader />
+                    ) : (
                       conversationData && conversationData?.conversations?.length > 0 ? (
                         <>
-                          {conversationData.conversations.map((c, index) => (
-                            <div
-                              key={index}
-                              className={`px-4 py-3 ${singleConversationId === 0
-                                ? conversationId && c.conversation_id === conversationId
-                                  ? "bg-gray-600 text-white"
-                                  : ""
-                                : singleConversationId === c.conversation_id
-                                  ? "bg-gray-600 text-white"
-                                  : ""
-                                } hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
-                              onClick={() => {
-                                //singleHistory(user_id, c.conversation_id); 
-                                setIsVisible(false); setIsComparison(false)
-                                nav(location.pathname, {
-                                  replace: true,
-                                  state: {
-                                    ...location.state,
-                                    pageNumberChat: page,
-                                    conversationId: c.conversation_id,
-                                    userId: conversationData.user_id,
-                                  },
-                                });
-                              }}
-                            >
-                              <p className="text-sm font-medium">{c.last_user_query}</p>
-                            </div>
-                          ))}
+                          {conversationData.conversations.map((c, index) => {
+
+
+                            const isSelected = singleConversationId === 0
+                              ? conversationId && c.conversation_id === conversationId
+                              : singleConversationId === c.conversation_id;
+
+                            return (
+                              <div
+                                key={index}
+                                ref={(el) => {
+                                  if (isSelected && el) {
+                                    if (!autoScroll) {
+                                      el.scrollIntoView({
+                                        behavior: "smooth",
+                                        block: "nearest",
+                                      });
+                                    }
+                                  }
+                                  // else if(el){
+                                  //    el.scrollIntoView({
+                                  //       behavior: "smooth",
+                                  //       block: "nearest",
+                                  //     });
+                                  // }
+                                }}
+                                className={`px-4 py-3 ${singleConversationId === 0
+                                  ? conversationId && c.conversation_id === conversationId
+                                    ? "bg-gray-600 text-white"
+                                    : ""
+                                  : singleConversationId === c.conversation_id
+                                    ? "bg-gray-600 text-white"
+                                    : ""
+                                  } hover:bg-gray-400 hover:text-white rounded-lg cursor-pointer transition`}
+                                onClick={() => {
+                                  //singleHistory(user_id, c.conversation_id); 
+                                  setIsVisible(false);
+                                  setIsComparison(false)
+                                  setAutoScroll(false);
+                                  nav(location.pathname, {
+                                    replace: true,
+                                    state: {
+                                      ...location.state,
+                                      pageNumberChat: page,
+                                      conversationId: c.conversation_id,
+                                      userId: conversationData.user_id,
+                                    },
+                                  });
+                                }}
+                              >
+                                <p className="text-sm font-medium">{c.last_user_query}</p>
+                              </div>
+                            )
+                          }
+                          )}
 
                           {/* View More Button */}
                           {hasMore && (
@@ -451,14 +496,6 @@ const MainHistory: React.FC = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Footer stays at bottom */}
-                {/* <button className={`w-full py-3 text-center text-sm font-medium rounded-b-2xl transition 
-                    ${!user_id || conversationData?.conversations.length === 0 ? "cursor-not-allowed text-white bg-gray-800 " : "text-white bg-gray-800 hover:bg-[#7C3BED] "}
-                  `}>
-                    View More
-                  </button> */}
-
               </div>
             </div>
 
