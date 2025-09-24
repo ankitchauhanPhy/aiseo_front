@@ -180,8 +180,10 @@ const MainHistory: React.FC = () => {
 
           const newConversations = response.data?.conversations || [];
           console.log("newConversations", newConversations, "conversationData", conversationData, "pagweNumber", pageNumber);
-
-          if (pageNumber === 1 && !conversationData) {
+          if(pageNumber === 1 && conversationData){
+            setConversationData(response.data);
+          }
+          else if (pageNumber === 1 && !conversationData) {
             setConversationData(response.data);
           } else {
             console.log(" else newConversations", newConversations, "conversationData", conversationData, "pagweNumber", pageNumber);
@@ -242,7 +244,7 @@ const MainHistory: React.FC = () => {
       fetchAll();
     } else if (user_id) {
       console.log("user_id 226", user_id);
-      getAllHistory(user_id, 1);
+      getAllHistory(user_id, page);
     }
   }, [userId, conversationId, user_id, pageNumberChat]);
 
