@@ -227,9 +227,15 @@ const MainHistory: React.FC = () => {
           }
         }
       } catch (err: any) {
-        setLoading(false);
-        toast.error(err.response?.data?.detail || err.message);
-      }
+            if (err.response) {
+              setHasMore(false);
+              toast.error(err.response.data.detail);
+            }
+            else toast.error(err.message);
+            console.error(err);
+          } finally {
+            setLoading(false);
+          }
     },
     [conversationId, userId] // ✅ only re-creates when these change
   );

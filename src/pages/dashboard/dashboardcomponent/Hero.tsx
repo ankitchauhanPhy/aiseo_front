@@ -176,6 +176,15 @@ export default function HeroSection() {
     }
   };
 
+  useEffect(() => {
+  if (showSignup || showLoginup || freeTrialPopup) {
+    document.body.style.overflow = "hidden"; // disable background scroll
+  } else {
+    document.body.style.overflow = ""; // re-enable scroll
+  }
+}, [showSignup, showLoginup, freeTrialPopup]);
+
+
   return (
     <>
       <section className="relative w-full flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28">
@@ -399,7 +408,7 @@ export default function HeroSection() {
 
       {/* Login Overlay */}
       {showLoginup && (
-        <div className="fixed inset-0 z-50">
+        <div className="popup-scroll fixed inset-0 z-50">
           <LoginPopup />
         </div>
       )}
