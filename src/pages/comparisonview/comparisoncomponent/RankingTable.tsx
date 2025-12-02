@@ -3,7 +3,10 @@ import { Trophy, Medal, Award } from "lucide-react"
 import MainHoistoryRankingChatgpt from "../../../assets/mainHistory/MainHistoryVisibilityLogo3.svg";
 import MainHistoryRankingGemini from "../../../assets/mainHistory/MainHistoryRankingGemini.svg";
 import MainHistoryRankingPerplexity1 from "../../../assets/mainHistory/MainHistoryRankingPerplexity1.svg";
-import MainHistoryRankingPerplexity2 from "../../../assets/mainHistory/MainHistoryRankingPerplexity2.svg";
+import MainHistorySerpAPI from "../../../assets/mainHistory/MainHistorySerpAPI.svg";
+import MainHistoryTavily from "../../../assets/mainHistory/MainHistoryTavily.svg";
+
+
 import { useAuth } from "@/authContext/useAuth";
 import { useEffect, useState } from "react";
 import {
@@ -87,7 +90,7 @@ function getTrophyIcon(rank: number) {
 function PlatformIcon({
   type,
 }: {
-  type: "chatgpt" | "gemini" | "perplexity1" | "perplexity2";
+  type: "chatgpt" | "gemini" | "perplexity1" | "tavily" | "serpApi";
 }) {
   let iconSrc: string;
 
@@ -101,15 +104,18 @@ function PlatformIcon({
     case "perplexity1":
       iconSrc = MainHistoryRankingPerplexity1;
       break;
-    case "perplexity2":
-      iconSrc = MainHistoryRankingPerplexity2;
+    case "tavily":
+      iconSrc = MainHistoryTavily;
+      break;
+    case "serpApi":
+      iconSrc = MainHistorySerpAPI;
       break;
     default:
       iconSrc = "";
   }
 
   return (
-    <div className="w-12 h-12 flex items-center justify-center">
+    <div className="w-15 h-10 flex items-center justify-center">
       {iconSrc ? (
         <img src={iconSrc} alt={type} className="w-6 h-6 object-contain" />
       ) : (
@@ -126,7 +132,7 @@ const RankingTable: React.FC<RankingTableProps> = ({
   setProductVisible,
 }) => {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const { setComparisonView, queryID,setQueryID, setCompetitorProductName, yourProductName, competitorProductName } = useAuth();
+  const { setComparisonView, queryID, setQueryID, setCompetitorProductName, yourProductName, competitorProductName } = useAuth();
   const [openDemo, setOpenDemo] = useState(false);
   const [yourProduct, setYourProduct] = useState<any>(null);
 
@@ -193,6 +199,20 @@ const RankingTable: React.FC<RankingTableProps> = ({
                   Perplexity
                 </span>
               </div>
+              <div className="flex flex-col items-center  w-[80px] md:w-[100px] lg:w-[120px] mt-2">
+                <PlatformIcon type="tavily" />
+                <span className="text-xs font-medium text-gray-700">
+                  Tavily
+                </span>
+                <span className="text-[10px] text-gray-400">Coming Soon</span>
+              </div>
+              <div className="flex flex-col items-center  w-[80px] md:w-[100px] lg:w-[120px] mt-2">
+                <PlatformIcon type="serpApi" />
+                <span className="text-xs font-medium text-gray-700">
+                  SerpApi
+                </span>
+                <span className="text-[10px] text-gray-400 ">Coming Soon</span>
+              </div>
             </div>
 
             {/* Competitor Rows - scrollable */}
@@ -208,7 +228,7 @@ const RankingTable: React.FC<RankingTableProps> = ({
                         : "hover:bg-blue-200"
                     }`}
                   onClick={() => {
-                    if(yourProductName !== competitor.name){
+                    if (yourProductName !== competitor.name) {
                       setQueryID(optimizationRank.query_id);
                       setCompetitorProductName?.(competitor.name);
                     }
@@ -359,7 +379,6 @@ const RankingTable: React.FC<RankingTableProps> = ({
           </div>
         </div>
       </div>
-      {/* <Rankings open={openDemo} onOpenChange={setOpenDemo} competitor={""} /> */}
     </>
   );
 };

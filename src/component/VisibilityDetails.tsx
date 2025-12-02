@@ -120,7 +120,7 @@ const VisibilityDetails: React.FC<VisibilityDetailsProps> = ({
               <h3 className="text-sm font-semibold text-gray-900 mb-2">
                 {citationsFound} citations found
               </h3>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-sm max-h-40 overflow-y-auto w-full">
                 {citationUrls && citationUrls.map((url, i) => (
                   <a
                     key={i}
@@ -166,13 +166,10 @@ const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
 }) => {
   const {
     productMatricesData,
-    competitorProductVisible,
-    productMatricesCompetitor,
-    setProductMatricesCompetitor
   } = useAuth();
 
   console.log("productMetricesData in visibility", productMatricesData);
-  console.log("productMetricesData Competitor", productMatricesCompetitor);
+ 
   let mockIcon;
   let count;
   if (visibilityData === "Perplexity") {
@@ -188,11 +185,8 @@ const ExampleVisibilityDetails: React.FC<Examplevisibility> = ({
 
   const platformKey = visibilityData.toLowerCase();
   const citationUrls = productMatricesData[0]?.citations?.[platformKey] ?? [];
-console.log("202=======",productMatricesCompetitor,competitorProductVisible)
-  // const citationUrls =
-  //   (competitorProductVisible
-  //     ? productMatricesCompetitor
-  //     : productMatricesData)[0]?.citations?.[platformKey] ?? [];
+//console.log("202=======",productMatricesCompetitor,competitorProductVisible)
+
 
   const sampleData = {
     title: visibilityData,

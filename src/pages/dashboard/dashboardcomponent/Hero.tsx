@@ -1,5 +1,5 @@
 import { ChevronRight, CircleX } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import SignUpPopup from "@/component/SignUp";
 import LoginPopup from "@/component/Login";
@@ -21,6 +21,10 @@ export default function HeroSection() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showHistory, setShowHistory] = useState(false);
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   // get context values
   const {
     showSignup,
@@ -41,32 +45,86 @@ export default function HeroSection() {
   } = useAuth();
 
   const nav = useNavigate();
-console.log("user_id", user_id);
-  async function getAllHistory(user_id: number) {
-     if(!user_id){
-          toast.warning("UserId not have");
-          return;
+  console.log("user_id", user_id);
+
+  // async function getAllHistory(user_id: number) {
+  //   if (!user_id) {
+  //     toast.warning("UserId not have");
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   try {
+  //     const response = await HistoryAPI.getAllhistory(user_id, 1, 10);
+  //     console.log("API Response:", response);
+  //     if (response.statusText) {
+  //       setConversationData(response.data);
+  //       setLoading(false);
+  //     }
+  //   } catch (err: any) {
+  //     setLoading(false);
+  //     if (err.response) {
+  //       toast.error(err.response.data.detail);
+  //     } else {
+  //       toast.error(err.message);
+  //     }
+  //     console.error("API Error:", err);
+  //     const message = err instanceof Error ? err.message : "Something went wrong!";
+  //     console.log("Error", message);
+  //   }
+  // }
+
+  // ============ API Call ============
+  const getAllHistory = useCallback(
+    async (userId: number, pageNumber: number) => {
+      if (!userId) {
+        toast.warning("User ID not found");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await HistoryAPI.getAllhistory(userId, pageNumber, 10);
+        if (response.statusText) {
+          const newData = response.data?.conversations || [];
+
+          if (pageNumber === 1) {
+            setConversationData({ user_id: userId, conversations: newData });
+          } else {
+            setConversationData((prev) => {
+              if (!prev) return { user_id: userId, conversations: newData };
+              return {
+                user_id: prev.user_id,
+                conversations: [...prev.conversations, ...newData],
+              };
+            });
+          }
+
+          // If less than limit, no more data
+          if (newData.length < 10) {
+            setHasMore(false);
+          }
         }
-    setLoading(true);
-    try {
-      const response = await HistoryAPI.getAllhistory(user_id);
-      console.log("API Response:", response);
-      if (response.statusText) {
-        setConversationData(response.data);
+      } catch (err: any) {
+        if (err.response) {
+          setHasMore(false);
+          toast.error(err.response.data.detail);
+        } else {
+          toast.error(err.message);
+        }
+      } finally {
         setLoading(false);
       }
-    } catch (err: any) {
-      setLoading(false);
-      if (err.response) {
-        toast.error(err.response.data.detail);
-      } else {
-        toast.error(err.message);
-      }
-      console.error("API Error:", err);
-      const message = err instanceof Error ? err.message : "Something went wrong!";
-      console.log("Error", message);
-    }
-  }
+    },
+    [setConversationData]
+  );
+
+  // Open history sidebar
+  const handleOpenHistory = () => {
+    setShowHistory(true);
+    setPage(1);
+    setHasMore(true);
+    getAllHistory(user_id, 1);
+  };
 
   useEffect(() => {
     const loginStatus = localStorage.getItem("login");
@@ -118,6 +176,15 @@ console.log("user_id", user_id);
     }
   };
 
+  useEffect(() => {
+  if (showSignup || showLoginup || freeTrialPopup) {
+    document.body.style.overflow = "hidden"; // disable background scroll
+  } else {
+    document.body.style.overflow = ""; // re-enable scroll
+  }
+}, [showSignup, showLoginup, freeTrialPopup]);
+
+
   return (
     <>
       <section className="relative w-full flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-28">
@@ -134,23 +201,21 @@ console.log("user_id", user_id);
           }}
         ></div>
 
-        {/* ===== Left Side "View History" Button ===== */}
-        {(loginDashboard && loginType) && (
+        {/* ===== Left Side "View History" Button & Sidebar ===== */}
+        {loginDashboard && loginType && (
           <>
-            {/* Button */}
             <button
-              className="fixed top-1/2/2 -left-23 transform -translate-y-1/2 rotate-[-90deg]
-      bg-white border border-gray-300 shadow-md px-15 py-2 rounded-lg text-md font-medium
-      hover:bg-gray-100 transition z-50"
-              onClick={() => { setShowHistory(true); getAllHistory(user_id); }}
+              className="fixed top-1/2 -left-22 transform -translate-y-1/2 rotate-[-90deg]
+                         bg-white border border-gray-300 shadow-md px-15 py-2 rounded-lg text-md font-medium
+                         hover:bg-gray-100 transition z-50"
+              onClick={handleOpenHistory}
             >
               View History
             </button>
 
-            {/* Sidebar */}
             <div
               className={`fixed top-0 left-0 h-full w-72 bg-white shadow-lg transform transition-transform duration-300 z-50 rounded-lg
-      ${showHistory ? "translate-x-0" : "-translate-x-full"}`}
+                        ${showHistory ? "translate-x-0" : "-translate-x-full"}`}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b">
                 <h2 className="font-semibold text-md">History</h2>
@@ -158,28 +223,51 @@ console.log("user_id", user_id);
                   <CircleX className="w-6 h-6 text-gray-600" />
                 </button>
               </div>
+
               {/* Scrollable Content */}
               <div className="p-4 space-y-3 overflow-y-auto h-[calc(100%-56px)]">
-                {loading ? (<Loader />) : (
-                   conversationData?.conversations && conversationData?.conversations.length > 0 ? (
-                    <>
-                      {conversationData.conversations.map((c) => (
-                        <div
-                          key={c.conversation_id}
-                          className="p-3 bg-gray-100 rounded-md hover:bg-gray-300 cursor-pointer"
+                {conversationData && conversationData?.conversations?.length > 0 ? (
+                  <>
+                    {conversationData.conversations.map((c: any) => (
+                      <div
+                        key={c.conversation_id}
+                        className="p-3 bg-gray-100 rounded-md hover:bg-gray-300 cursor-pointer"
+                        onClick={() =>
+                          nav("/optimization", {
+                            state: { userId: user_id, conversationId: c.conversation_id, pageNumberChat: page },
+                          })
+                        }
+                      >
+                        {c.last_user_query}
+                      </div>
+                    ))}
+
+                    {/* ===== View More Button ===== */}
+                    {console.log("hasMore", hasMore)}
+                    {hasMore && (
+                      <div className="flex justify-center mt-2">
+                        <button
+                          className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition w-full"
                           onClick={() => {
-                            nav("/optimization", {
-                              state: { userId: user_id, conversationId: c.conversation_id }
-                            })
+                            const nextPage = page + 1;
+                            setPage(nextPage);
+                            getAllHistory(user_id, nextPage);
                           }}
+                          disabled={loading}
                         >
-                          {c.last_user_query}
-                        </div>
-                      ))}
-                    </>
-                  ) : (
-                    <NoDataFound/>
-                  )
+                          {loading ? "Loading..." : "View More"}
+                        </button>
+                      </div>
+                    )}
+
+                    {!hasMore && (
+                      <p className="text-center text-gray-500 text-sm mt-2">No more data</p>
+                    )}
+                  </>
+                ) : loading ? (
+                  <Loader />
+                ) : (
+                  <NoDataFound />
                 )}
               </div>
             </div>
@@ -320,7 +408,7 @@ console.log("user_id", user_id);
 
       {/* Login Overlay */}
       {showLoginup && (
-        <div className="fixed inset-0 z-50">
+        <div className="popup-scroll fixed inset-0 z-50">
           <LoginPopup />
         </div>
       )}
