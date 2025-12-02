@@ -246,7 +246,7 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
             </div>
 
             {/* Competitor Rows - scrollable */}
-            <div className="divide-y divide-gray-200 overflow-y-auto flex-1">
+            <div className={`divide-y divide-gray-200 ${competitors.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"} flex-1`}>
               {loadingRank ? <Loader /> : (
                 competitors.length > 0 ?
                 competitors.map((competitor, index) => (
@@ -356,10 +356,12 @@ const RankingsTable: React.FC<RankingTableProps> = ({ optimizationRank, productV
                   </div>
                 ))
                 : (
+                  <div className="h-[100%]">
                   <NoDataFound/>
+                  </div>
                 )
               )}
-              {noData && <NoDataFound />}
+              {/* {noData && <NoDataFound />} */}
             </div>
           </div>
         </div>

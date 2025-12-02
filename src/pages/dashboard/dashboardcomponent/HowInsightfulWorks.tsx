@@ -12,7 +12,7 @@ const HowInsightfulWorks = () => {
   const [circleDot, setCircleDot] = useState(1);
 
   // get context values
-    const { setShowLoginup } = useAuth();
+    const { setShowLoginup, user_id } = useAuth();
 
 
   const slides = [
@@ -136,14 +136,15 @@ const HowInsightfulWorks = () => {
           </p>
         </div>
       </div>
-      <button
+      {user_id === 0 && (
+         <button
         className="mt-15 mx-auto flex items-center justify-center bg-[#7b3aed] px-6 py-3 sm:w-[220px] w-full rounded-lg font-semibold text-white hover:bg-[#692ed3] transition"
         onClick={() => setShowLoginup(true)}
       >
         <span className="mr-2">Start Free Trial</span>
         <FaArrowRight />
       </button>
-
+      )}
     </div>
   );
 };

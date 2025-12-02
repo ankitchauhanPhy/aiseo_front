@@ -19,7 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
   const nav = useNavigate();
 
   // get context values
-  const { setShowLoginup, loginType, setLoginType, comparisonView, setComparisonView, setUser_id} = useAuth();
+  const { setShowLoginup, loginType, setLoginType, comparisonView, setComparisonView, setUser_id, setConversationData, setQueryID} = useAuth();
 
   useEffect(() => {
     if (loginType) {
@@ -45,6 +45,8 @@ const Navbar: React.FC<NavbarProps> = ({ afterLogin }) => {
     localStorage.removeItem("use_iD");
     setLoginType(false);
     setOpen(false);
+    setConversationData(null);
+    setQueryID(0);
     nav("/");
   }
 

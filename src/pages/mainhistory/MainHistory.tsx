@@ -125,6 +125,7 @@ const MainHistory: React.FC = () => {
       return () => clearTimeout(timer); // cleanup
     }
   }, []);
+
   async function singleHistory(userId: number, conversationId: number) {
     try {
       setLoading(true);
@@ -178,6 +179,7 @@ const MainHistory: React.FC = () => {
       }
     } catch (err: any) {
       setLoading(false);
+      
       if (err.response) {
         toast.error(err.response.data.detail);
       } else {
