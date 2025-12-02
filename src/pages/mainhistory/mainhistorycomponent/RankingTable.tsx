@@ -243,92 +243,6 @@ const RankingsTable: React.FC<RankingTableProps> = ({
             </tr>
           </thead>
 
-<<<<<<< HEAD
-
-              {/* Platforms */}
-              <div className="flex flex-col items-center gap-1 md:gap-2 w-[80px] md:w-[100px] lg:w-[120px]">
-                <PlatformIcon type="chatgpt" />
-                <span className="text-xs font-medium text-gray-700">Open AI</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 md:gap-2 w-[80px] md:w-[100px] lg:w-[120px]">
-                <PlatformIcon type="gemini" />
-                <span className="text-xs font-medium text-gray-700">Gemini</span>
-              </div>
-              <div className="flex flex-col items-center gap-1 md:gap-2 w-[80px] md:w-[100px] lg:w-[120px]">
-                <PlatformIcon type="perplexity1" />
-                <span className="text-xs font-medium text-gray-700">Perplexity</span>
-              </div>
-            </div>
-
-            {/* Competitor Rows - scrollable */}
-            <div className={`divide-y divide-gray-200 ${competitors.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"} flex-1`}>
-              {loadingRank ? <Loader /> : (
-                competitors.length > 0 ?
-                competitors.map((competitor, index) => (
-                  <div
-                    data-tour={`ranking-row-${index}`}
-                    key={index}
-                    className={`flex items-center gap-1 md:gap-2 p-4 min-w-[600px] 
-                             ${competitor.isYou || yourProduct === competitor.name ? "bg-purple-200" : "hover:bg-blue-300"} 
-                              cursor-pointer rounded-xl`}
-                    onClick={() => {
-                      if (!productVisible && isVisible && !isComparison) {
-                        setYourProduct(competitor.name)
-                        setYourProductName(competitor.name)
-                        setCompetitors(prev =>
-                          prev.map((c, i) => ({
-                            ...c,
-                            isYou: i === index // only clicked competitor is true
-                          }))
-                        )
-                        productMatrices(queryID, competitor.name)
-
-                      } 
-                      else if (!productVisible && !isVisible && !isComparison) {
-                        toast.info("Firstly check the Visibility");
-                      }
-                      else if (productVisible && !isComparison && !isVisible) {
-                        toast.info("Firstly check the visibility");
-                      }
-                      else if(productVisible && isVisible && !isComparison){
-                        setYourProduct(competitor.name)
-                        setYourProductName(competitor.name)
-                        setCompetitors(prev =>
-                          prev.map((c, i) => ({
-                            ...c,
-                            isYou: i === index // only clicked competitor is true
-                          }))
-                        )
-                        productMatrices(queryID, competitor.name)
-                      }
-                      else if (productVisible && isComparison && isVisible) {
-                        setComparisonView(true)
-                        setCompetitorProductName?.(competitor.name)
-                      }
-                    }}
-                  >
-                    {/* Overall Rank */}
-                    <div className="flex items-center justify-center w-[60px] md:w-[80px] lg:w-[80px]">
-                      <span className="text-sm font-medium text-gray-600">
-                        {formatRank(competitor.overallRank)}
-                      </span>
-                    </div>
-
-                    {/* Competitor Info */}
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center min-w-[150px] md:min-w-0 lg:w-[20%] overflow-hidden cursor-pointer">
-                            {/* Avatar with first letter */}
-                            <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-300 rounded-full flex items-center justify-center text-sm font-semibold text-gray-700 flex-shrink-0 mr-2">
-                              {competitor.name.charAt(0).toUpperCase()}
-                            </div>
-
-                            {/* Name + Trophy */}
-                            <div className="flex items-center overflow-hidden">
-                              <span className="text-sm font-medium text-gray-900 truncate">
-                                {competitor.name.split(" ").slice(0, 2).join(" ")}
-=======
           <tbody className="divide-y divide-gray-200">
             {loadingRank ? (
               <tr>
@@ -387,7 +301,6 @@ const RankingsTable: React.FC<RankingTableProps> = ({
                               {/* Trophy icon */}
                               <span className="flex-shrink-0">
                                 {getTrophyIcon(competitor.overallRank)}
->>>>>>> 4b709dcc25d9dbd645b254efeadf27060826886b
                               </span>
                             </div>
                           </TooltipTrigger>
@@ -400,42 +313,6 @@ const RankingsTable: React.FC<RankingTableProps> = ({
                   </td>
 
 
-<<<<<<< HEAD
-                    {/* Platform Rankings */}
-                    <div className="w-[80px] md:w-[100px] lg:w-[120px] text-center">
-                      <span className={`text-sm font-medium ${getRankingColor(competitor.rankings.openAI)}`}>
-                        {competitor.rankings.openAI
-                          ? formatRank(competitor.rankings.openAI)
-                          : "-"}
-                      </span>
-                    </div>
-                    <div className="w-[80px] md:w-[100px] lg:w-[120px] text-center">
-                      <span className={`text-sm font-medium ${getRankingColor(competitor.rankings.gemini)}`}>
-                        {competitor.rankings.gemini
-                          ? formatRank(competitor.rankings.gemini)
-                          : "-"}
-                      </span>
-                    </div>
-                    <div className="w-[80px] md:w-[100px] lg:w-[120px] text-center">
-                      <span className={`text-sm font-medium ${getRankingColor(competitor.rankings.perplexity1)}`}>
-                        {competitor.rankings.perplexity1
-                          ? formatRank(competitor.rankings.perplexity1)
-                          : "-"}
-                      </span>
-                    </div>
-                  </div>
-                ))
-                : (
-                  <div className="h-[100%]">
-                  <NoDataFound/>
-                  </div>
-                )
-              )}
-              {/* {noData && <NoDataFound />} */}
-            </div>
-          </div>
-        </div>
-=======
 
                   {/* Platform Ranks */}
                   <td className="px-4 py-2 text-center">
@@ -472,7 +349,6 @@ const RankingsTable: React.FC<RankingTableProps> = ({
             )}
           </tbody>
         </table>
->>>>>>> 4b709dcc25d9dbd645b254efeadf27060826886b
       </div>
     </div>
   )

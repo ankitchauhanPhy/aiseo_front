@@ -125,12 +125,9 @@ const MainHistory: React.FC = () => {
     }
   }, []);
 
-<<<<<<< HEAD
-=======
 
 
   // ================= SINGLE HISTORY =================
->>>>>>> 4b709dcc25d9dbd645b254efeadf27060826886b
   async function singleHistory(userId: number, conversationId: number) {
     try {
       setLoading(true);
@@ -229,19 +226,6 @@ const MainHistory: React.FC = () => {
             singleHistory(user_id, response.data.conversations[0]?.conversation_id);
           }
         }
-<<<<<<< HEAD
-      }
-    } catch (err: any) {
-      setLoading(false);
-      
-      if (err.response) {
-        toast.error(err.response.data.detail);
-      } else {
-        toast.error(err.message);
-      }
-    }
-  }
-=======
       } catch (err: any) {
             if (err.response) {
               setHasMore(false);
@@ -255,7 +239,6 @@ const MainHistory: React.FC = () => {
     },
     [conversationId, userId] // ✅ only re-creates when these change
   );
->>>>>>> 4b709dcc25d9dbd645b254efeadf27060826886b
 
   //============ChatEndRef========
   //   useEffect(() => {
